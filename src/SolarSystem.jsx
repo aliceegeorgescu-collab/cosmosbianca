@@ -501,6 +501,7 @@ function generateGalaxyStars(seed, opts = {}) {
     return s / 233280;
   };
   const isMob = typeof window !== 'undefined' && window.innerWidth < 768;
+  const sizeMul = isMob ? 1.6 : 1;
   const armCount = opts.armCount ?? 2;
   const starsPerArm = opts.starsPerArm ?? (isMob ? 100 : 240);
   const bulgeStars = opts.bulgeStars ?? (isMob ? 40 : 90);
@@ -518,7 +519,7 @@ function generateGalaxyStars(seed, opts = {}) {
     stars.push({
       x: Math.cos(angle) * r,
       y: Math.sin(angle) * r * flatten,
-      size: 0.5 + rand() * 1.0,
+      size: (0.5 + rand() * 1.0) * sizeMul,
       opacity: 0.75 + rand() * 0.25,
       kind: 'core',
     });
@@ -536,7 +537,7 @@ function generateGalaxyStars(seed, opts = {}) {
       stars.push({
         x: Math.cos(angle) * r + noiseX,
         y: Math.sin(angle) * r * flatten + noiseY,
-        size: 0.3 + rand() * 1.4,
+        size: (0.3 + rand() * 1.4) * sizeMul,
         opacity: 0.55 + rand() * 0.45,
         kind: roll < 0.7 ? 'arm' : roll < 0.9 ? 'core' : 'highlight',
       });
@@ -549,7 +550,7 @@ function generateGalaxyStars(seed, opts = {}) {
     stars.push({
       x: Math.cos(angle) * r,
       y: Math.sin(angle) * r * flatten,
-      size: 0.2 + rand() * 0.7,
+      size: (0.2 + rand() * 0.7) * sizeMul,
       opacity: 0.25 + rand() * 0.35,
       kind: 'halo',
     });
@@ -561,7 +562,7 @@ function generateGalaxyStars(seed, opts = {}) {
     stars.push({
       x: Math.cos(angle) * r,
       y: Math.sin(angle) * r * flatten,
-      size: 0.4 + rand() * 1.2,
+      size: (0.4 + rand() * 1.2) * sizeMul,
       opacity: 0.18 + rand() * 0.3,
       kind: 'dust',
     });
@@ -2720,7 +2721,9 @@ export default function SolarSystem() {
 
       {/* Gaură neagră + galaxii */}
       {cosmicObjects.map((obj) => {
-        const mobileSize = obj.type === 'galaxy' ? Math.round(obj.size * 0.65) : Math.round(obj.size * 0.7);
+        const mobileSize = obj.type === 'galaxy'
+          ? Math.round(obj.size * 0.95)
+          : Math.round(obj.size * 0.55);
         const effectiveSize = isMobile ? mobileSize : obj.size;
         return (
         <button
