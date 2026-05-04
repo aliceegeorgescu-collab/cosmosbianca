@@ -1254,9 +1254,9 @@ export default function SolarSystem() {
 
   useEffect(() => {
     const isMob = typeof window !== 'undefined' && window.innerWidth < 768;
-    const STARS_COUNT = isMob ? 50 : 120;
-    const COMETS_COUNT = isMob ? 25 : 76;
-    const ASTEROIDS_COUNT = isMob ? 30 : 90;
+    const STARS_COUNT = isMob ? 35 : 120;
+    const COMETS_COUNT = isMob ? 10 : 76;
+    const ASTEROIDS_COUNT = isMob ? 15 : 90;
 
     const generated = Array.from({ length: STARS_COUNT }, () => ({
       top: Math.random() * 100,
@@ -2649,15 +2649,17 @@ export default function SolarSystem() {
         />
       ))}
 
-      {/* Constelații zodiacale */}
-      {zodiacConstellations.map((z) => (
-        <Constellation
-          key={z.id}
-          data={z}
-          visited={visited}
-          onClick={() => handlePlanetClick(z)}
-        />
-      ))}
+      {/* Constelații zodiacale - pe mobil afișăm doar 4 cele mai recunoscute */}
+      {zodiacConstellations
+        .filter((z) => !isMobile || ['leu', 'sagetator', 'pesti', 'gemeni'].includes(z.id))
+        .map((z) => (
+          <Constellation
+            key={z.id}
+            data={z}
+            visited={visited}
+            onClick={() => handlePlanetClick(z)}
+          />
+        ))}
 
       {/* Șarpe astronaut care plutește (clickabil) */}
       <button
@@ -2674,7 +2676,7 @@ export default function SolarSystem() {
         }}
         title="Sis Șarpele Astronaut"
       >
-        <SnakeAstronaut size={110} />
+        <SnakeAstronaut size={isMobile ? 60 : 110} />
       </button>
 
       {/* Pinguin astronaut care plutește (clickabil) */}
@@ -2692,7 +2694,7 @@ export default function SolarSystem() {
         }}
         title="Pip Pinguinul Astronaut"
       >
-        <PenguinAstronaut size={75} />
+        <PenguinAstronaut size={isMobile ? 42 : 75} />
       </button>
 
       {/* Rachetă care zboară diagonal (clickabilă) */}
@@ -2712,7 +2714,7 @@ export default function SolarSystem() {
         title="Racheta Stea"
       >
         <div style={{ transform: 'rotate(45deg)' }}>
-          <Rocket size={100} />
+          <Rocket size={isMobile ? 55 : 100} />
         </div>
       </button>
 
@@ -2994,7 +2996,8 @@ export default function SolarSystem() {
             <RealisticSun size={170} paused={paused} />
           </button>
 
-          {/* Cometa Halley pe orbită eliptică */}
+          {/* Cometa Halley pe orbită eliptică - ascuns pe mobil */}
+      {!isMobile && (
       <div
         className="absolute pointer-events-none"
         style={{
@@ -3049,40 +3052,42 @@ export default function SolarSystem() {
           </span>
         </div>
       </div>
+      )}
 
-      {/* Voyager 1 */}
-      <div
-        className="absolute pointer-events-none"
-        style={{ top: '8%', left: '92%', zIndex: 4 }}
-      >
-        <svg viewBox="0 0 50 30" width="50" height="30" style={{ overflow: 'visible' }}>
-          <rect x="20" y="12" width="14" height="6" fill="#dddddd" stroke="#888" strokeWidth="0.5" />
-          <line x1="2" y1="15" x2="20" y2="15" stroke="#aaa" strokeWidth="0.5" />
-          <circle cx="2" cy="15" r="6" fill="none" stroke="#fff" strokeWidth="1.2" />
-          <line x1="34" y1="15" x2="44" y2="15" stroke="#aaa" strokeWidth="0.5" />
-          <rect x="44" y="11" width="6" height="8" fill="#cc8855" />
-        </svg>
-        <div className="text-[10px] text-white/70 mt-0.5 text-center" style={{ textShadow: '0 1px 2px #000' }}>
-          🛸 Voyager 1
-        </div>
-      </div>
-
-      {/* Voyager 2 */}
-      <div
-        className="absolute pointer-events-none"
-        style={{ top: '88%', left: '6%', zIndex: 4 }}
-      >
-        <svg viewBox="0 0 50 30" width="46" height="28" style={{ overflow: 'visible' }}>
-          <rect x="20" y="12" width="14" height="6" fill="#dddddd" stroke="#888" strokeWidth="0.5" />
-          <line x1="2" y1="15" x2="20" y2="15" stroke="#aaa" strokeWidth="0.5" />
-          <circle cx="2" cy="15" r="6" fill="none" stroke="#fff" strokeWidth="1.2" />
-          <line x1="34" y1="15" x2="44" y2="15" stroke="#aaa" strokeWidth="0.5" />
-          <rect x="44" y="11" width="6" height="8" fill="#cc8855" />
-        </svg>
-        <div className="text-[10px] text-white/70 mt-0.5 text-center" style={{ textShadow: '0 1px 2px #000' }}>
-          🛸 Voyager 2
-        </div>
-      </div>
+      {!isMobile && (
+        <>
+          <div
+            className="absolute pointer-events-none"
+            style={{ top: '8%', left: '92%', zIndex: 4 }}
+          >
+            <svg viewBox="0 0 50 30" width="50" height="30" style={{ overflow: 'visible' }}>
+              <rect x="20" y="12" width="14" height="6" fill="#dddddd" stroke="#888" strokeWidth="0.5" />
+              <line x1="2" y1="15" x2="20" y2="15" stroke="#aaa" strokeWidth="0.5" />
+              <circle cx="2" cy="15" r="6" fill="none" stroke="#fff" strokeWidth="1.2" />
+              <line x1="34" y1="15" x2="44" y2="15" stroke="#aaa" strokeWidth="0.5" />
+              <rect x="44" y="11" width="6" height="8" fill="#cc8855" />
+            </svg>
+            <div className="text-[10px] text-white/70 mt-0.5 text-center" style={{ textShadow: '0 1px 2px #000' }}>
+              🛸 Voyager 1
+            </div>
+          </div>
+          <div
+            className="absolute pointer-events-none"
+            style={{ top: '88%', left: '6%', zIndex: 4 }}
+          >
+            <svg viewBox="0 0 50 30" width="46" height="28" style={{ overflow: 'visible' }}>
+              <rect x="20" y="12" width="14" height="6" fill="#dddddd" stroke="#888" strokeWidth="0.5" />
+              <line x1="2" y1="15" x2="20" y2="15" stroke="#aaa" strokeWidth="0.5" />
+              <circle cx="2" cy="15" r="6" fill="none" stroke="#fff" strokeWidth="1.2" />
+              <line x1="34" y1="15" x2="44" y2="15" stroke="#aaa" strokeWidth="0.5" />
+              <rect x="44" y="11" width="6" height="8" fill="#cc8855" />
+            </svg>
+            <div className="text-[10px] text-white/70 mt-0.5 text-center" style={{ textShadow: '0 1px 2px #000' }}>
+              🛸 Voyager 2
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Centura de asteroizi */}
           {asteroids.map((a, i) => (
