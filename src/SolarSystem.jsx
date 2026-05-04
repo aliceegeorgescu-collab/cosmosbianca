@@ -4332,7 +4332,7 @@ export default function SolarSystem() {
       {/* Card cu informații */}
       {selectedPlanet && (
         <div
-          className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-2 md:p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-start justify-center p-2 md:p-4 pt-16 md:pt-20 pb-8 overflow-y-auto"
           style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
           onClick={closeCard}
         >
@@ -4366,15 +4366,15 @@ export default function SolarSystem() {
             })}
           </div>
           <div
-            className="relative max-w-md w-full rounded-3xl p-5 md:p-8 text-white my-4 md:my-0"
+            className="relative max-w-md w-full rounded-3xl p-5 md:p-8 text-white"
             onClick={(e) => e.stopPropagation()}
             style={{
               background: 'linear-gradient(145deg, rgba(40,40,80,0.95), rgba(20,20,50,0.95))',
               border: `2px solid ${selectedPlanet.color}`,
               boxShadow: `0 0 40px ${selectedPlanet.color}80, 0 20px 60px rgba(0,0,0,0.5)`,
               animation: 'cardIn 0.4s ease-out',
-              marginTop: 'max(20px, env(safe-area-inset-top))',
-              marginBottom: 'max(20px, env(safe-area-inset-bottom))',
+              marginTop: '60px',
+              marginBottom: '20px',
             }}
           >
             <button
