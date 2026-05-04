@@ -2606,8 +2606,9 @@ export default function SolarSystem() {
   };
 
   return (
-    <div className="relative w-full overflow-hidden" style={{
-      height: '100vh',
+    <div className="relative w-full overflow-x-hidden" style={{
+      height: isMobile ? '140vh' : '100vh',
+      minHeight: isMobile ? '1100px' : '100vh',
       background: 'radial-gradient(ellipse at center, #1a1a3e 0%, #0a0a1f 60%, #000000 100%)',
       fontFamily: '"Comic Sans MS", "Chalkboard SE", "Marker Felt", system-ui, sans-serif',
     }}>
