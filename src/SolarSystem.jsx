@@ -847,18 +847,23 @@ function SnakeAstronaut({ size = 160 }) {
       <ellipse cx="234" cy="62" rx="32" ry="28" fill="url(#snakeHelmetG)" stroke="rgba(255,255,255,0.95)" strokeWidth="2.5" />
       <ellipse cx="216" cy="48" rx="7" ry="13" fill="rgba(255,255,255,0.65)" transform="rotate(-15 216 48)" />
       <ellipse cx="252" cy="76" rx="3" ry="5" fill="rgba(255,255,255,0.4)" />
-      <ellipse cx="220" cy="74" rx="4" ry="2" fill="#ff95b4" opacity="0.75" />
-      <ellipse cx="252" cy="74" rx="4" ry="2" fill="#ff95b4" opacity="0.75" />
-      <circle cx="224" cy="58" r="7" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.5" />
-      <circle cx="246" cy="58" r="7" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.5" />
-      <circle cx="225" cy="60" r="4.2" fill="#1a1a1a" />
-      <circle cx="247" cy="60" r="4.2" fill="#1a1a1a" />
-      <circle cx="222" cy="56" r="2" fill="#ffffff" />
-      <circle cx="244" cy="56" r="2" fill="#ffffff" />
-      <circle cx="227" cy="62" r="0.8" fill="#ffffff" opacity="0.6" />
-      <circle cx="249" cy="62" r="0.8" fill="#ffffff" opacity="0.6" />
-      <path d="M 224 76 Q 235 83 246 76" stroke="#1a1a1a" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-      <path d="M 230 80 Q 235 84 240 80 Q 235 83 230 80 Z" fill="#ff5577" opacity="0.7" />
+      <ellipse cx="219" cy="73" rx="6" ry="3.5" fill="#ff7799" opacity="0.85" />
+      <ellipse cx="252" cy="73" rx="6" ry="3.5" fill="#ff7799" opacity="0.85" />
+      <ellipse cx="219" cy="73" rx="3" ry="1.5" fill="#ffffff" opacity="0.6" />
+      <ellipse cx="252" cy="73" rx="3" ry="1.5" fill="#ffffff" opacity="0.6" />
+      <ellipse cx="225" cy="60" rx="7" ry="9" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.6" />
+      <ellipse cx="247" cy="60" rx="7" ry="9" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.6" />
+      <ellipse cx="226" cy="63" rx="5" ry="6.5" fill="#1a1a1a" />
+      <ellipse cx="247" cy="63" rx="5" ry="6.5" fill="#1a1a1a" />
+      <circle cx="223" cy="59" r="2.4" fill="#ffffff" />
+      <circle cx="245" cy="59" r="2.4" fill="#ffffff" />
+      <circle cx="228" cy="66" r="1.3" fill="#ffffff" opacity="0.85" />
+      <circle cx="249" cy="66" r="1.3" fill="#ffffff" opacity="0.85" />
+      <circle cx="226" cy="56" r="0.7" fill="#ffffff" opacity="0.95" />
+      <circle cx="247" cy="56" r="0.7" fill="#ffffff" opacity="0.95" />
+      <path d="M 222 78 Q 235 87 248 78" stroke="#1a1a1a" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+      <path d="M 230 82 Q 235 86 240 82" stroke="#1a1a1a" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.5" />
+      <path d="M 229 81 Q 235 85 241 81 Q 235 84 229 81 Z" fill="#ff6688" opacity="0.85" />
       <path
         d="M 264 64 Q 270 62, 274 65 L 270 68 L 278 70 L 270 74 L 274 78 L 264 80"
         fill="#ff3355"
@@ -955,20 +960,25 @@ function PenguinAstronaut({ size = 110 }) {
       <ellipse cx="65" cy="64" rx="32" ry="34" fill="url(#penguHeadG)" />
       <ellipse cx="65" cy="72" rx="24" ry="26" fill="#ffffff" />
       <circle cx="65" cy="72" r="22" fill="rgba(255,255,255,0.5)" filter="blur(0.5)" />
-      <circle cx="55" cy="58" r="9" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.6" />
-      <circle cx="75" cy="58" r="9" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.6" />
-      <circle cx="56" cy="60" r="5.5" fill="#1a1a1a" />
-      <circle cx="76" cy="60" r="5.5" fill="#1a1a1a" />
-      <circle cx="54" cy="57" r="2.5" fill="#ffffff" />
-      <circle cx="74" cy="57" r="2.5" fill="#ffffff" />
-      <circle cx="58" cy="63" r="1" fill="#ffffff" opacity="0.8" />
-      <circle cx="78" cy="63" r="1" fill="#ffffff" opacity="0.8" />
-      <ellipse cx="46" cy="76" rx="6" ry="3.5" fill="#ff9eb5" opacity="0.7" />
-      <ellipse cx="84" cy="76" rx="6" ry="3.5" fill="#ff9eb5" opacity="0.7" />
-      <path d="M 56 80 Q 65 92 74 80 Q 65 85 56 80 Z" fill="url(#penguBeakG)" stroke="#aa5500" strokeWidth="1" />
-      <path d="M 60 82 Q 65 86 70 82" stroke="#aa5500" strokeWidth="0.5" fill="none" />
-      <path d="M 56 90 Q 65 96 74 90" stroke="#1a1a1a" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-      <path d="M 60 92 Q 65 95 70 92 Q 65 95 60 92 Z" fill="#ff7799" opacity="0.7" />
+      <ellipse cx="55" cy="58" rx="9" ry="11" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.8" />
+      <ellipse cx="75" cy="58" rx="9" ry="11" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.8" />
+      <ellipse cx="56" cy="61" rx="6" ry="8" fill="#1a1a1a" />
+      <ellipse cx="76" cy="61" rx="6" ry="8" fill="#1a1a1a" />
+      <circle cx="53" cy="57" r="3" fill="#ffffff" />
+      <circle cx="73" cy="57" r="3" fill="#ffffff" />
+      <circle cx="58" cy="65" r="1.4" fill="#ffffff" opacity="0.9" />
+      <circle cx="78" cy="65" r="1.4" fill="#ffffff" opacity="0.9" />
+      <circle cx="56" cy="54" r="0.8" fill="#ffffff" opacity="0.95" />
+      <circle cx="76" cy="54" r="0.8" fill="#ffffff" opacity="0.95" />
+      <ellipse cx="44" cy="76" rx="8" ry="4.5" fill="#ff7799" opacity="0.85" />
+      <ellipse cx="86" cy="76" rx="8" ry="4.5" fill="#ff7799" opacity="0.85" />
+      <ellipse cx="44" cy="76" rx="4" ry="2" fill="#ffffff" opacity="0.5" />
+      <ellipse cx="86" cy="76" rx="4" ry="2" fill="#ffffff" opacity="0.5" />
+      <ellipse cx="65" cy="84" rx="7" ry="5" fill="url(#penguBeakG)" stroke="#aa5500" strokeWidth="1" />
+      <path d="M 60 84 Q 65 87 70 84" stroke="#aa5500" strokeWidth="0.6" fill="none" opacity="0.6" />
+      <ellipse cx="65" cy="83" rx="3" ry="1" fill="rgba(255,255,255,0.5)" />
+      <path d="M 56 92 Q 65 100 74 92" stroke="#1a1a1a" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path d="M 60 94 Q 65 98 70 94 Q 65 98 60 94 Z" fill="#ff6688" opacity="0.85" />
     </svg>
   );
 }
