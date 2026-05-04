@@ -1726,6 +1726,8 @@ export default function SolarSystem() {
       size: 200,
       top: '6%',
       right: '4%',
+      mobileTop: '62%',
+      mobileRight: '8%',
       moons: 'Înghite tot ce se apropie',
       year: '—',
       diameter: 'Poate fi de milioane de ori mai mare decât Soarele',
@@ -2845,6 +2847,10 @@ export default function SolarSystem() {
           ? Math.round(obj.size * 0.95)
           : Math.round(obj.size * 0.55);
         const effectiveSize = isMobile ? mobileSize : obj.size;
+        const eTop = isMobile && obj.mobileTop ? obj.mobileTop : obj.top;
+        const eBottom = isMobile && obj.mobileBottom ? obj.mobileBottom : obj.bottom;
+        const eLeft = isMobile && obj.mobileLeft ? obj.mobileLeft : obj.left;
+        const eRight = isMobile && obj.mobileRight ? obj.mobileRight : obj.right;
         return (
         <button
           key={obj.id}
@@ -2853,10 +2859,10 @@ export default function SolarSystem() {
           style={{
             width: `${effectiveSize}px`,
             height: `${effectiveSize}px`,
-            top: obj.top,
-            bottom: obj.bottom,
-            left: obj.left,
-            right: obj.right,
+            top: eTop,
+            bottom: eBottom,
+            left: eLeft,
+            right: eRight,
             background: 'transparent',
             border: 'none',
             padding: 0,
