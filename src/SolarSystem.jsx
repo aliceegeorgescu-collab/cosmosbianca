@@ -1252,6 +1252,19 @@ export default function SolarSystem() {
   }, []);
 
   useEffect(() => {
+    document.body.style.overflowX = 'hidden';
+    document.body.style.overflowY = isMobile ? 'auto' : 'hidden';
+    document.documentElement.style.overflowX = 'hidden';
+    document.documentElement.style.overflowY = isMobile ? 'auto' : 'hidden';
+    return () => {
+      document.body.style.overflowX = '';
+      document.body.style.overflowY = '';
+      document.documentElement.style.overflowX = '';
+      document.documentElement.style.overflowY = '';
+    };
+  }, [isMobile]);
+
+  useEffect(() => {
     const SYSTEM_SIZE = 1740;
     const compute = () => {
       const isMob = window.innerWidth < 768;
@@ -2712,8 +2725,9 @@ export default function SolarSystem() {
 
   return (
     <div className="relative w-full overflow-x-hidden" style={{
-      height: isMobile ? '115vh' : '100vh',
-      minHeight: isMobile ? '900px' : '100vh',
+      height: isMobile ? '108vh' : '100vh',
+      minHeight: isMobile ? '780px' : '100vh',
+      overflowY: isMobile ? 'visible' : 'hidden',
       background: 'radial-gradient(ellipse at center, #1a1a3e 0%, #0a0a1f 60%, #000000 100%)',
       fontFamily: '"Comic Sans MS", "Chalkboard SE", "Marker Felt", system-ui, sans-serif',
     }}>
