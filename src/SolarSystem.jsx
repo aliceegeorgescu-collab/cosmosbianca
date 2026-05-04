@@ -2649,9 +2649,9 @@ export default function SolarSystem() {
         />
       ))}
 
-      {/* Constelații zodiacale - pe mobil afișăm doar 4 cele mai recunoscute */}
+      {/* Constelații zodiacale - pe mobil afișăm doar 3 alese de utilizator */}
       {zodiacConstellations
-        .filter((z) => !isMobile || ['leu', 'sagetator', 'pesti', 'gemeni'].includes(z.id))
+        .filter((z) => !isMobile || ['capricorn', 'fecioara', 'rac'].includes(z.id))
         .map((z) => (
           <Constellation
             key={z.id}
@@ -2719,14 +2719,17 @@ export default function SolarSystem() {
       </button>
 
       {/* Gaură neagră + galaxii */}
-      {cosmicObjects.map((obj) => (
+      {cosmicObjects.map((obj) => {
+        const mobileSize = obj.type === 'galaxy' ? Math.round(obj.size * 0.65) : Math.round(obj.size * 0.7);
+        const effectiveSize = isMobile ? mobileSize : obj.size;
+        return (
         <button
           key={obj.id}
           onClick={() => handlePlanetClick(obj)}
           className="absolute cursor-pointer transition-transform hover:scale-110 z-[5]"
           style={{
-            width: `${obj.size}px`,
-            height: `${obj.size}px`,
+            width: `${effectiveSize}px`,
+            height: `${effectiveSize}px`,
             top: obj.top,
             bottom: obj.bottom,
             left: obj.left,
@@ -2740,7 +2743,7 @@ export default function SolarSystem() {
           {obj.type === 'blackhole' && (
             <>
               <div className="absolute pointer-events-none" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                <BlackHoleVisual size={obj.size} paused={paused} />
+                <BlackHoleVisual size={effectiveSize} paused={paused} />
               </div>
               <span
                 className="absolute text-white text-xs font-semibold whitespace-nowrap pointer-events-none"
@@ -2760,7 +2763,7 @@ export default function SolarSystem() {
               <div className="absolute pointer-events-none" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
                 <RealisticGalaxy
                   id={obj.id}
-                  size={obj.size}
+                  size={effectiveSize}
                   armColor={obj.armColor}
                   coreColor={obj.coreColor}
                   glowColor={obj.glowColor}
@@ -2784,7 +2787,8 @@ export default function SolarSystem() {
             </>
           )}
         </button>
-      ))}
+        );
+      })}
 
       {/* Antet */}
       <div className="relative z-20 pt-3 md:pt-6 px-3 md:px-4 text-center">
@@ -4122,12 +4126,12 @@ export default function SolarSystem() {
           }}
         >
           <div className="relative">
-            <UFO size={90} />
+            <UFO size={isMobile ? 55 : 90} />
             <div
               className="absolute"
               style={{
-                top: '-50px',
-                [ufo.fromLeft ? 'left' : 'right']: '60px',
+                top: isMobile ? '-38px' : '-50px',
+                [ufo.fromLeft ? 'left' : 'right']: isMobile ? '40px' : '60px',
                 background: 'rgba(255,255,255,0.95)',
                 color: '#222',
                 padding: '6px 12px',
