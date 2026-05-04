@@ -888,10 +888,10 @@ function PenguinAstronaut({ size = 110 }) {
     <svg viewBox="0 0 130 195" width={size} height={(size * 195) / 130} style={{ overflow: 'visible' }}>
       <defs>
         <radialGradient id="penguBodyG" cx="0.32" cy="0.28">
-          <stop offset="0%" stopColor="#7a7d85" />
-          <stop offset="40%" stopColor="#3a3d45" />
-          <stop offset="80%" stopColor="#1a1c22" />
-          <stop offset="100%" stopColor="#0a0b0f" />
+          <stop offset="0%" stopColor="#5e6878" />
+          <stop offset="40%" stopColor="#2a3242" />
+          <stop offset="80%" stopColor="#15192a" />
+          <stop offset="100%" stopColor="#0a0c18" />
         </radialGradient>
         <radialGradient id="penguBellyG" cx="0.42" cy="0.4">
           <stop offset="0%" stopColor="#ffffff" />
@@ -899,52 +899,43 @@ function PenguinAstronaut({ size = 110 }) {
           <stop offset="100%" stopColor="#d8d8e0" />
         </radialGradient>
         <radialGradient id="penguHeadG" cx="0.32" cy="0.28">
-          <stop offset="0%" stopColor="#5a5d65" />
-          <stop offset="50%" stopColor="#2a2d35" />
-          <stop offset="100%" stopColor="#0e0f15" />
-        </radialGradient>
-        <radialGradient id="penguHelmetG" cx="0.28" cy="0.22">
-          <stop offset="0%" stopColor="rgba(255,255,255,0.98)" />
-          <stop offset="30%" stopColor="rgba(180,220,255,0.45)" />
-          <stop offset="70%" stopColor="rgba(120,180,230,0.18)" />
-          <stop offset="100%" stopColor="rgba(80,140,200,0.12)" />
+          <stop offset="0%" stopColor="#4a5365" />
+          <stop offset="50%" stopColor="#1f2535" />
+          <stop offset="100%" stopColor="#0a0e1a" />
         </radialGradient>
         <radialGradient id="penguBeakG" cx="0.4" cy="0.3">
-          <stop offset="0%" stopColor="#ffd066" />
-          <stop offset="60%" stopColor="#ff9922" />
-          <stop offset="100%" stopColor="#cc5500" />
+          <stop offset="0%" stopColor="#ffcc55" />
+          <stop offset="55%" stopColor="#f4a13e" />
+          <stop offset="100%" stopColor="#c47020" />
         </radialGradient>
-        <linearGradient id="penguPackG" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="#cc8855" />
-          <stop offset="50%" stopColor="#9a5530" />
-          <stop offset="100%" stopColor="#5a2f15" />
+        <linearGradient id="hatTeal" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#7eddec" />
+          <stop offset="60%" stopColor="#5cc4d0" />
+          <stop offset="100%" stopColor="#3a9aa8" />
+        </linearGradient>
+        <linearGradient id="hatRed" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#e85a4d" />
+          <stop offset="60%" stopColor="#d34b3e" />
+          <stop offset="100%" stopColor="#a03328" />
+        </linearGradient>
+        <radialGradient id="pomPom" cx="0.35" cy="0.3">
+          <stop offset="0%" stopColor="#cdf2f6" />
+          <stop offset="55%" stopColor="#7eddec" />
+          <stop offset="100%" stopColor="#3a9aa8" />
+        </radialGradient>
+        <linearGradient id="scarfRed" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#e85a4d" />
+          <stop offset="50%" stopColor="#d34b3e" />
+          <stop offset="100%" stopColor="#a03328" />
         </linearGradient>
       </defs>
-      <ellipse cx="65" cy="180" rx="38" ry="6" fill="rgba(0,0,0,0.4)" />
-      <rect x="40" y="95" width="50" height="58" rx="11" fill="url(#penguPackG)" />
-      <rect x="40" y="95" width="50" height="58" rx="11" fill="rgba(255,255,255,0.08)" />
-      <rect x="46" y="103" width="6" height="40" rx="2" fill="#3a1f0a" opacity="0.7" />
-      <rect x="78" y="103" width="6" height="40" rx="2" fill="#3a1f0a" opacity="0.7" />
-      <rect x="56" y="115" width="18" height="3" rx="1.5" fill="#ffaa00" opacity="0.85" />
-      <rect x="56" y="122" width="14" height="2.5" rx="1" fill="#88dd44" opacity="0.85" />
-      <circle cx="94" cy="92" r="4" fill="#ffaa00">
-        <animate attributeName="opacity" values="1;0.5;1" dur="1.4s" repeatCount="indefinite" />
-      </circle>
-      <line x1="94" y1="92" x2="106" y2="68" stroke="#888" strokeWidth="2" />
-      <circle cx="106" cy="68" r="4" fill="#ff4444">
-        <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" repeatCount="indefinite" />
-      </circle>
-      <ellipse cx="65" cy="120" rx="48" ry="58" fill="url(#penguBodyG)" />
-      <path d="M 32 130 Q 25 145 28 165" stroke="rgba(255,255,255,0.18)" strokeWidth="3" fill="none" strokeLinecap="round" />
-      <path d="M 100 130 Q 108 145 102 165" stroke="rgba(255,255,255,0.12)" strokeWidth="3" fill="none" strokeLinecap="round" />
-      <ellipse cx="65" cy="125" rx="33" ry="44" fill="url(#penguBellyG)" />
-      <ellipse cx="55" cy="108" rx="5" ry="14" fill="rgba(255,255,255,0.55)" />
-      <ellipse cx="75" cy="155" rx="3" ry="9" fill="rgba(0,0,0,0.06)" />
-      <circle cx="60" cy="135" r="3" fill="#5fbf5f" stroke="#fff" strokeWidth="0.8" opacity="0.85" />
-      <text x="60" y="138" textAnchor="middle" fontSize="4" fontWeight="bold" fill="#fff">PIP</text>
+      <ellipse cx="65" cy="183" rx="40" ry="6" fill="rgba(0,0,0,0.4)" />
+      <ellipse cx="65" cy="125" rx="48" ry="58" fill="url(#penguBodyG)" />
+      <ellipse cx="65" cy="130" rx="33" ry="44" fill="url(#penguBellyG)" />
+      <ellipse cx="55" cy="115" rx="5" ry="14" fill="rgba(255,255,255,0.55)" />
       <ellipse cx="20" cy="120" rx="12" ry="30" fill="url(#penguBodyG)" transform="rotate(-18 20 120)" />
       <ellipse cx="110" cy="120" rx="12" ry="30" fill="url(#penguBodyG)" transform="rotate(18 110 120)">
-        <animateTransform attributeName="transform" type="rotate" values="18 110 120;35 110 120;18 110 120" dur="1.4s" repeatCount="indefinite" />
+        <animateTransform attributeName="transform" type="rotate" values="18 110 120;32 110 120;18 110 120" dur="1.6s" repeatCount="indefinite" />
       </ellipse>
       <ellipse cx="115" cy="98" rx="6" ry="3" fill="rgba(255,255,255,0.3)" transform="rotate(18 115 98)" />
       <ellipse cx="48" cy="180" rx="15" ry="7" fill="url(#penguBeakG)" />
@@ -953,32 +944,52 @@ function PenguinAstronaut({ size = 110 }) {
       <ellipse cx="82" cy="178" rx="11" ry="3" fill="rgba(255,255,255,0.35)" />
       <circle cx="49" cy="183" r="1.4" fill="#3a1500" />
       <circle cx="83" cy="183" r="1.4" fill="#3a1500" />
-      <circle cx="65" cy="60" r="44" fill="rgba(0,0,0,0.4)" transform="translate(2,3)" />
-      <circle cx="65" cy="60" r="44" fill="url(#penguHelmetG)" stroke="rgba(255,255,255,0.95)" strokeWidth="3" />
-      <ellipse cx="48" cy="40" rx="10" ry="18" fill="rgba(255,255,255,0.78)" transform="rotate(-12 48 40)" />
-      <ellipse cx="82" cy="80" rx="4" ry="7" fill="rgba(255,255,255,0.45)" />
-      <ellipse cx="65" cy="64" rx="32" ry="34" fill="url(#penguHeadG)" />
-      <ellipse cx="65" cy="72" rx="24" ry="26" fill="#ffffff" />
-      <circle cx="65" cy="72" r="22" fill="rgba(255,255,255,0.5)" filter="blur(0.5)" />
-      <ellipse cx="55" cy="58" rx="9" ry="11" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.8" />
-      <ellipse cx="75" cy="58" rx="9" ry="11" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.8" />
-      <ellipse cx="56" cy="61" rx="6" ry="8" fill="#1a1a1a" />
-      <ellipse cx="76" cy="61" rx="6" ry="8" fill="#1a1a1a" />
-      <circle cx="53" cy="57" r="3" fill="#ffffff" />
-      <circle cx="73" cy="57" r="3" fill="#ffffff" />
-      <circle cx="58" cy="65" r="1.4" fill="#ffffff" opacity="0.9" />
-      <circle cx="78" cy="65" r="1.4" fill="#ffffff" opacity="0.9" />
-      <circle cx="56" cy="54" r="0.8" fill="#ffffff" opacity="0.95" />
-      <circle cx="76" cy="54" r="0.8" fill="#ffffff" opacity="0.95" />
-      <ellipse cx="44" cy="76" rx="8" ry="4.5" fill="#ff7799" opacity="0.85" />
-      <ellipse cx="86" cy="76" rx="8" ry="4.5" fill="#ff7799" opacity="0.85" />
-      <ellipse cx="44" cy="76" rx="4" ry="2" fill="#ffffff" opacity="0.5" />
-      <ellipse cx="86" cy="76" rx="4" ry="2" fill="#ffffff" opacity="0.5" />
-      <ellipse cx="65" cy="84" rx="7" ry="5" fill="url(#penguBeakG)" stroke="#aa5500" strokeWidth="1" />
-      <path d="M 60 84 Q 65 87 70 84" stroke="#aa5500" strokeWidth="0.6" fill="none" opacity="0.6" />
-      <ellipse cx="65" cy="83" rx="3" ry="1" fill="rgba(255,255,255,0.5)" />
-      <path d="M 56 92 Q 65 100 74 92" stroke="#1a1a1a" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <path d="M 60 94 Q 65 98 70 94 Q 65 98 60 94 Z" fill="#ff6688" opacity="0.85" />
+      <path d="M 18 88 Q 35 86 65 88 Q 95 86 112 88 L 110 102 Q 95 100 65 102 Q 35 100 20 102 Z" fill="url(#scarfRed)" />
+      <path d="M 22 91 L 108 91" stroke="#ffffff" strokeWidth="1.5" opacity="0.85" />
+      <path d="M 22 96 L 108 96" stroke="#ffffff" strokeWidth="1.5" opacity="0.85" />
+      <path d="M 18 100 Q 12 110 8 130 Q 6 145 12 142 L 18 102 Z" fill="url(#scarfRed)" />
+      <path d="M 8 130 L 18 132 L 16 138 L 6 138 Z" fill="#ffffff" opacity="0.95" />
+      <path d="M 14 138 L 18 144 L 8 145 Z" fill="url(#scarfRed)" />
+      <ellipse cx="65" cy="68" rx="36" ry="38" fill="url(#penguHeadG)" />
+      <ellipse cx="65" cy="76" rx="26" ry="28" fill="#ffffff" />
+      <ellipse cx="55" cy="62" rx="11" ry="13" fill="#ffffff" stroke="#1a1a1a" strokeWidth="2" />
+      <ellipse cx="75" cy="62" rx="11" ry="13" fill="#ffffff" stroke="#1a1a1a" strokeWidth="2" />
+      <ellipse cx="55" cy="65" rx="7" ry="9" fill="#1a1a1a" />
+      <ellipse cx="75" cy="65" rx="7" ry="9" fill="#1a1a1a" />
+      <ellipse cx="53" cy="60" rx="2.5" ry="3" fill="#5ca8d4" />
+      <ellipse cx="73" cy="60" rx="2.5" ry="3" fill="#5ca8d4" />
+      <circle cx="52" cy="59" r="2.2" fill="#ffffff" />
+      <circle cx="72" cy="59" r="2.2" fill="#ffffff" />
+      <circle cx="58" cy="68" r="1.5" fill="#ffffff" opacity="0.9" />
+      <circle cx="78" cy="68" r="1.5" fill="#ffffff" opacity="0.9" />
+      <circle cx="55" cy="56" r="0.8" fill="#ffffff" opacity="0.95" />
+      <circle cx="75" cy="56" r="0.8" fill="#ffffff" opacity="0.95" />
+      <ellipse cx="42" cy="80" rx="9" ry="5" fill="#f4a3b3" opacity="0.95" />
+      <ellipse cx="88" cy="80" rx="9" ry="5" fill="#f4a3b3" opacity="0.95" />
+      <ellipse cx="42" cy="79" rx="5" ry="2.5" fill="#ffffff" opacity="0.5" />
+      <ellipse cx="88" cy="79" rx="5" ry="2.5" fill="#ffffff" opacity="0.5" />
+      <path d="M 58 82 L 65 92 L 72 82 Z" fill="url(#penguBeakG)" stroke="#a8631a" strokeWidth="1" strokeLinejoin="round" />
+      <ellipse cx="65" cy="84" rx="3" ry="1" fill="rgba(255,255,255,0.55)" />
+      <line x1="65" y1="86" x2="65" y2="91" stroke="#a8631a" strokeWidth="0.5" opacity="0.6" />
+      <path d="M 56 96 Q 65 102 74 96" stroke="#1a1a1a" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path d="M 60 97 Q 65 100 70 97 Q 65 100 60 97 Z" fill="#ff6688" opacity="0.85" />
+      <path d="M 26 42 Q 65 22 104 42 L 102 56 Q 65 38 28 56 Z" fill="url(#hatTeal)" />
+      <path d="M 28 38 Q 65 16 102 38 L 100 30 Q 65 12 30 30 Z" fill="url(#hatTeal)" />
+      <ellipse cx="65" cy="22" rx="38" ry="6" fill="rgba(255,255,255,0.18)" />
+      <path d="M 24 50 Q 65 32 106 50 L 105 64 Q 65 48 25 64 Z" fill="url(#hatRed)" />
+      <ellipse cx="65" cy="52" rx="42" ry="5" fill="#ffffff" opacity="0.85" />
+      <ellipse cx="65" cy="50" rx="42" ry="2" fill="rgba(0,0,0,0.15)" />
+      <circle cx="60" cy="14" r="11" fill="url(#pomPom)" />
+      <circle cx="56" cy="11" r="3" fill="#ffffff" opacity="0.7" />
+      <g opacity="0.6">
+        <line x1="55" y1="6" x2="58" y2="10" stroke="#5cc4d0" strokeWidth="0.8" />
+        <line x1="65" y1="6" x2="63" y2="10" stroke="#5cc4d0" strokeWidth="0.8" />
+        <line x1="50" y1="14" x2="54" y2="14" stroke="#5cc4d0" strokeWidth="0.8" />
+        <line x1="69" y1="14" x2="65" y2="14" stroke="#5cc4d0" strokeWidth="0.8" />
+        <line x1="55" y1="22" x2="58" y2="18" stroke="#5cc4d0" strokeWidth="0.8" />
+        <line x1="65" y1="22" x2="63" y2="18" stroke="#5cc4d0" strokeWidth="0.8" />
+      </g>
+      <line x1="60" y1="14" x2="60" y2="22" stroke="#3a9aa8" strokeWidth="2" opacity="0.5" />
     </svg>
   );
 }
