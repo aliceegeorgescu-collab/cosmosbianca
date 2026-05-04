@@ -2256,6 +2256,12 @@ export default function SolarSystem() {
     ctx.fill();
   };
 
+  const deleteCustomPlanet = (id) => {
+    if (!confirm('Sigur vrei să ștergi planeta ta? Nu mai poate fi recuperată.')) return;
+    setCustomPlanets((prev) => prev.filter((p) => p.id !== id));
+    if (selectedPlanet?.id === id) closeCard();
+  };
+
   const savePlanet = () => {
     const canvas = drawCanvasRef.current;
     if (!canvas) return;
@@ -4467,17 +4473,44 @@ export default function SolarSystem() {
                 <div className="font-semibold">{selectedPlanet.moons}</div>
               </div>
             </div>
-            <button
-              onClick={closeCard}
-              className="mt-5 w-full py-3 rounded-2xl font-bold text-base transition-all"
-              style={{
-                background: `${selectedPlanet.color}40`,
-                border: `2px solid ${selectedPlanet.color}`,
-                color: '#fff',
-              }}
-            >
-              ✕ Închide
-            </button>
+            {selectedPlanet.isCustom ? (
+              <div className="mt-5 grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => deleteCustomPlanet(selectedPlanet.id)}
+                  className="py-3 rounded-2xl font-bold text-base"
+                  style={{
+                    background: 'rgba(255,80,80,0.25)',
+                    border: '2px solid rgba(255,80,80,0.7)',
+                    color: '#fff',
+                  }}
+                >
+                  🗑️ Șterge
+                </button>
+                <button
+                  onClick={closeCard}
+                  className="py-3 rounded-2xl font-bold text-base"
+                  style={{
+                    background: `${selectedPlanet.color}40`,
+                    border: `2px solid ${selectedPlanet.color}`,
+                    color: '#fff',
+                  }}
+                >
+                  ✕ Închide
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={closeCard}
+                className="mt-5 w-full py-3 rounded-2xl font-bold text-base transition-all"
+                style={{
+                  background: `${selectedPlanet.color}40`,
+                  border: `2px solid ${selectedPlanet.color}`,
+                  color: '#fff',
+                }}
+              >
+                ✕ Închide
+              </button>
+            )}
           </div>
         </div>
       )}
