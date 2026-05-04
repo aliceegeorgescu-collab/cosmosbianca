@@ -1046,6 +1046,8 @@ export default function SolarSystem() {
   const [wishFlying, setWishFlying] = useState(false);
   const [meteorShowerActive, setMeteorShowerActive] = useState(false);
   const [eclipseActive, setEclipseActive] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [showGamesMenu, setShowGamesMenu] = useState(false);
   const [memoryGame, setMemoryGame] = useState(null);
   const [sortGame, setSortGame] = useState(null);
@@ -1142,11 +1144,13 @@ export default function SolarSystem() {
   useEffect(() => {
     const SYSTEM_SIZE = 1740;
     const compute = () => {
-      const headerReserve = 230;
+      const isMob = window.innerWidth < 768;
+      setIsMobile(isMob);
+      const headerReserve = isMob ? 170 : 230;
       const availH = window.innerHeight - headerReserve;
-      const availW = window.innerWidth - 40;
+      const availW = window.innerWidth - 20;
       const s = Math.min(availH / SYSTEM_SIZE, availW / SYSTEM_SIZE, 1);
-      setSystemScale(Math.max(s, 0.25));
+      setSystemScale(Math.max(s, 0.18));
     };
     compute();
     window.addEventListener('resize', compute);
@@ -2765,20 +2769,54 @@ export default function SolarSystem() {
       ))}
 
       {/* Antet */}
-      <div className="relative z-20 pt-6 px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-2" style={{
+      <div className="relative z-20 pt-3 md:pt-6 px-3 md:px-4 text-center">
+        <h1 className="text-2xl md:text-5xl font-bold text-white mb-1 md:mb-2" style={{
           textShadow: '0 0 20px rgba(255,200,100,0.6), 0 2px 4px rgba(0,0,0,0.5)',
           letterSpacing: '0.05em',
         }}>
           ✨ Sistemul Solar ✨
         </h1>
-        <p className="text-yellow-200 text-base md:text-lg mb-2">
+        <p className="text-yellow-200 text-xs md:text-lg mb-1 md:mb-2 hidden sm:block">
           Apasă pe o planetă pentru a afla secretele ei!
         </p>
-        <div className="text-yellow-100/80 text-sm mb-3">
+        <div className="text-yellow-100/80 text-xs md:text-sm mb-2 md:mb-3">
           🌟 Descoperite: <span className="font-bold text-yellow-300">{visited.size}</span> / {TOTAL_DISCOVERABLE}
         </div>
-        <div className="inline-flex flex-wrap items-center justify-center gap-2">
+        {/* Bara butoane mobil */}
+        <div className="md:hidden inline-flex flex-wrap items-center justify-center gap-2">
+          <button
+            onClick={() => setPaused(!paused)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm border border-white/20 text-sm"
+          >
+            {paused ? <Play size={16} /> : <Pause size={16} />}
+            <span>{paused ? 'Pornește' : 'Pauză'}</span>
+          </button>
+          <button
+            onClick={() => setMuted(!muted)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm border border-white/20 text-sm"
+          >
+            {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            <span>{muted ? 'Off' : 'On'}</span>
+          </button>
+          <button
+            onClick={() => setShowGamesMenu(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-white rounded-full backdrop-blur-sm border border-white/40 text-sm font-bold"
+            style={{ background: 'linear-gradient(135deg, rgba(120,180,255,0.5), rgba(255,140,200,0.5))' }}
+          >
+            <span>🎮</span>
+            <span>Jocuri</span>
+          </button>
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="inline-flex items-center justify-center px-3 py-2 bg-white/15 hover:bg-white/25 text-white rounded-full backdrop-blur-sm border border-white/30 text-sm font-bold"
+            title="Mai multe opțiuni"
+          >
+            <span>⚙️ Mai mult</span>
+          </button>
+        </div>
+
+        {/* Bara butoane desktop */}
+        <div className="hidden md:inline-flex flex-wrap items-center justify-center gap-2">
           <button
             onClick={() => setPaused(!paused)}
             className="inline-flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-sm border border-white/20 text-sm"
@@ -3087,8 +3125,8 @@ export default function SolarSystem() {
                 onClick={() => handlePlanetClick(planet)}
                 className="absolute cursor-pointer transition-transform hover:scale-125 group"
                 style={{
-                  width: `${Math.max(planet.size, 28)}px`,
-                  height: `${Math.max(planet.size, 28)}px`,
+                  width: `${Math.max(planet.size, isMobile ? 56 : 28)}px`,
+                  height: `${Math.max(planet.size, isMobile ? 56 : 28)}px`,
                   top: '50%',
                   left: '0',
                   transform: 'translate(-50%, -50%)',
@@ -3366,6 +3404,107 @@ export default function SolarSystem() {
                 💾 Salvează planeta!
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Drawer mobil cu acțiuni */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-[55] flex items-end"
+          style={{ background: 'rgba(0,0,0,0.6)' }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div
+            className="w-full rounded-t-3xl p-4 text-white"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'linear-gradient(180deg, rgba(40,30,80,0.97), rgba(15,15,40,0.97))',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderBottom: 'none',
+              boxShadow: '0 -10px 30px rgba(0,0,0,0.5)',
+              animation: 'drawerUp 0.3s ease-out',
+            }}
+          >
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-bold">⚙️ Mai multe</h3>
+              <button onClick={() => setMobileMenuOpen(false)} className="text-white/70 hover:text-white">
+                <X size={22} />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => { toggleMusic(); setMobileMenuOpen(false); }}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold border"
+                style={{ background: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.2)' }}
+              >
+                <span className="text-xl">{musicOn ? '🎵' : '🎶'}</span>
+                <span>{musicOn ? 'Muzică on' : 'Muzică off'}</span>
+              </button>
+              <button
+                onClick={() => { tourActive ? stopTour() : startTour(); setMobileMenuOpen(false); }}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold border"
+                style={{
+                  background: tourActive ? 'rgba(255,80,80,0.25)' : 'rgba(120,180,255,0.25)',
+                  borderColor: tourActive ? 'rgba(255,80,80,0.5)' : 'rgba(120,180,255,0.5)',
+                }}
+              >
+                <span className="text-xl">{tourActive ? '⏹️' : '🎬'}</span>
+                <span>{tourActive ? 'Stop tur' : 'Tur ghidat'}</span>
+              </button>
+              <button
+                onClick={() => { startQuiz(); setMobileMenuOpen(false); }}
+                disabled={visited.size < 5}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold border disabled:opacity-40"
+                style={{ background: 'rgba(255,200,80,0.25)', borderColor: 'rgba(255,200,80,0.5)' }}
+              >
+                <span className="text-xl">🎯</span>
+                <span>Quiz</span>
+              </button>
+              <button
+                onClick={() => { openDrawingMode(); setMobileMenuOpen(false); }}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold border"
+                style={{ background: 'rgba(255,120,180,0.25)', borderColor: 'rgba(255,120,180,0.5)' }}
+              >
+                <span className="text-xl">🎨</span>
+                <span>Desenează</span>
+              </button>
+              <button
+                onClick={() => { setShowAgeCalc(true); setMobileMenuOpen(false); }}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold border"
+                style={{ background: 'rgba(120,255,180,0.25)', borderColor: 'rgba(120,255,180,0.5)' }}
+              >
+                <span className="text-xl">🎂</span>
+                <span>Vârsta mea</span>
+              </button>
+              <button
+                onClick={() => { triggerMeteorShower(); setMobileMenuOpen(false); }}
+                disabled={meteorShowerActive}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold border disabled:opacity-40"
+                style={{ background: 'rgba(180,160,255,0.25)', borderColor: 'rgba(180,160,255,0.5)' }}
+              >
+                <span className="text-xl">☄️</span>
+                <span>Meteoriți</span>
+              </button>
+              <button
+                onClick={() => { triggerEclipse(); setMobileMenuOpen(false); }}
+                disabled={eclipseActive}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold border disabled:opacity-40 col-span-2"
+                style={{ background: 'rgba(50,50,90,0.5)', borderColor: 'rgba(120,120,160,0.5)' }}
+              >
+                <span className="text-xl">🌑</span>
+                <span>Eclipsă</span>
+              </button>
+            </div>
+            {earnedBadges.size > 0 && (
+              <div className="mt-3 flex flex-wrap justify-center gap-1 text-xl">
+                {badges
+                  .filter((b) => earnedBadges.has(b.id))
+                  .map((b) => (
+                    <span key={b.id}>{b.emoji}</span>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -4435,6 +4574,10 @@ export default function SolarSystem() {
           15%  { opacity: 1; }
           80%  { opacity: 1; }
           100% { opacity: 0; }
+        }
+        @keyframes drawerUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
         }
         @keyframes confettiFall {
           0% {
