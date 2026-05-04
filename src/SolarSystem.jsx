@@ -776,109 +776,120 @@ function SnakeAstronaut({ size = 160 }) {
     <svg viewBox="0 0 280 160" width={size} height={(size * 160) / 280} style={{ overflow: 'visible' }}>
       <defs>
         <linearGradient id="snakeBodyG" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="#a8f0a8" />
-          <stop offset="35%" stopColor="#5fcf5f" />
-          <stop offset="70%" stopColor="#3a9a3a" />
-          <stop offset="100%" stopColor="#1f5a1f" />
+          <stop offset="0%" stopColor="#fff0a8" />
+          <stop offset="30%" stopColor="#ffd255" />
+          <stop offset="65%" stopColor="#e69a1a" />
+          <stop offset="100%" stopColor="#a85e0a" />
         </linearGradient>
         <radialGradient id="snakeHead" cx="0.35" cy="0.3">
-          <stop offset="0%" stopColor="#a8f0a8" />
-          <stop offset="60%" stopColor="#5fcf5f" />
-          <stop offset="100%" stopColor="#2d7d2d" />
+          <stop offset="0%" stopColor="#fff5d0" />
+          <stop offset="50%" stopColor="#f4c542" />
+          <stop offset="100%" stopColor="#a85e0a" />
         </radialGradient>
-        <radialGradient id="snakeBelly" cx="0.5" cy="0.5">
-          <stop offset="0%" stopColor="#e8ffe8" stopOpacity="0.75" />
-          <stop offset="100%" stopColor="#a8eba8" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="snakeHelmetG" cx="0.3" cy="0.25">
-          <stop offset="0%" stopColor="rgba(255,255,255,0.95)" />
-          <stop offset="40%" stopColor="rgba(180,220,255,0.4)" />
-          <stop offset="100%" stopColor="rgba(120,180,230,0.18)" />
+        <linearGradient id="snakeBellyG" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="rgba(255,250,200,0)" />
+          <stop offset="50%" stopColor="rgba(255,245,180,0.65)" />
+          <stop offset="100%" stopColor="rgba(255,230,140,0)" />
+        </linearGradient>
+        <radialGradient id="snakeSpotG" cx="0.35" cy="0.3">
+          <stop offset="0%" stopColor="#e88820" />
+          <stop offset="100%" stopColor="#9a4a08" />
         </radialGradient>
       </defs>
       <path
         d="M 8 110 Q 40 55, 78 100 T 158 92 T 230 62"
-        stroke="rgba(0,0,0,0.35)"
+        stroke="rgba(0,0,0,0.4)"
         strokeWidth="34"
         fill="none"
         strokeLinecap="round"
-        transform="translate(2,4)"
+        transform="translate(2,5)"
       />
       <path
         d="M 8 110 Q 40 55, 78 100 T 158 92 T 230 62"
-        stroke="#1f5a1f"
-        strokeWidth="30"
+        stroke="#a85e0a"
+        strokeWidth="32"
         fill="none"
         strokeLinecap="round"
       />
       <path
         d="M 8 110 Q 40 55, 78 100 T 158 92 T 230 62"
         stroke="url(#snakeBodyG)"
-        strokeWidth="26"
+        strokeWidth="28"
         fill="none"
         strokeLinecap="round"
       />
       <path
         d="M 10 110 Q 40 60, 78 100 T 158 92 T 228 62"
-        stroke="rgba(255,255,255,0.45)"
-        strokeWidth="6"
+        stroke="rgba(255,250,200,0.5)"
+        strokeWidth="7"
         fill="none"
         strokeLinecap="round"
-        transform="translate(0,-7)"
+        transform="translate(0,-8)"
       />
-      <g opacity="0.85">
-        <ellipse cx="32" cy="98" rx="5" ry="3" fill="#c8f5c8" opacity="0.7" />
-        <ellipse cx="58" cy="78" rx="5" ry="3" fill="#c8f5c8" opacity="0.7" />
-        <ellipse cx="84" cy="92" rx="5" ry="3" fill="#c8f5c8" opacity="0.7" />
-        <ellipse cx="110" cy="80" rx="5" ry="3" fill="#c8f5c8" opacity="0.7" />
-        <ellipse cx="136" cy="98" rx="5" ry="3" fill="#c8f5c8" opacity="0.7" />
-        <ellipse cx="162" cy="86" rx="5" ry="3" fill="#c8f5c8" opacity="0.7" />
-        <ellipse cx="188" cy="76" rx="5" ry="3" fill="#c8f5c8" opacity="0.7" />
-        <ellipse cx="214" cy="70" rx="5" ry="3" fill="#c8f5c8" opacity="0.7" />
+      <g>
+        <ellipse cx="32" cy="105" rx="6" ry="4" fill="url(#snakeSpotG)" opacity="0.85" />
+        <ellipse cx="56" cy="78" rx="7" ry="5" fill="url(#snakeSpotG)" opacity="0.9" />
+        <ellipse cx="80" cy="100" rx="6" ry="4" fill="url(#snakeSpotG)" opacity="0.85" />
+        <ellipse cx="106" cy="84" rx="7" ry="5" fill="url(#snakeSpotG)" opacity="0.9" />
+        <ellipse cx="132" cy="100" rx="6" ry="4" fill="url(#snakeSpotG)" opacity="0.85" />
+        <ellipse cx="158" cy="92" rx="7" ry="4.5" fill="url(#snakeSpotG)" opacity="0.9" />
+        <ellipse cx="184" cy="80" rx="6" ry="4" fill="url(#snakeSpotG)" opacity="0.85" />
+        <ellipse cx="208" cy="68" rx="6" ry="4" fill="url(#snakeSpotG)" opacity="0.9" />
       </g>
-      <g opacity="0.6">
-        <circle cx="44" cy="92" r="2" fill="rgba(255,255,255,0.6)" />
-        <circle cx="98" cy="84" r="2" fill="rgba(255,255,255,0.6)" />
-        <circle cx="148" cy="92" r="2" fill="rgba(255,255,255,0.6)" />
-        <circle cx="200" cy="73" r="2" fill="rgba(255,255,255,0.6)" />
+      <g opacity="0.55">
+        <ellipse cx="48" cy="92" rx="3" ry="2" fill="#7a3508" />
+        <ellipse cx="92" cy="90" rx="3" ry="2" fill="#7a3508" />
+        <ellipse cx="120" cy="92" rx="3" ry="2" fill="#7a3508" />
+        <ellipse cx="148" cy="98" rx="3" ry="2" fill="#7a3508" />
+        <ellipse cx="174" cy="86" rx="3" ry="2" fill="#7a3508" />
+        <ellipse cx="200" cy="74" rx="3" ry="2" fill="#7a3508" />
       </g>
-      <ellipse cx="234" cy="62" rx="30" ry="26" fill="rgba(0,0,0,0.35)" transform="translate(2,3)" />
-      <ellipse cx="234" cy="62" rx="28" ry="24" fill="url(#snakeHead)" />
-      <ellipse cx="234" cy="62" rx="32" ry="28" fill="url(#snakeHelmetG)" stroke="rgba(255,255,255,0.95)" strokeWidth="2.5" />
-      <ellipse cx="216" cy="48" rx="7" ry="13" fill="rgba(255,255,255,0.65)" transform="rotate(-15 216 48)" />
-      <ellipse cx="252" cy="76" rx="3" ry="5" fill="rgba(255,255,255,0.4)" />
+      <g opacity="0.45">
+        <line x1="36" y1="98" x2="38" y2="106" stroke="#fff5d4" strokeWidth="1" strokeLinecap="round" />
+        <line x1="60" y1="80" x2="64" y2="74" stroke="#fff5d4" strokeWidth="1" strokeLinecap="round" />
+        <line x1="100" y1="86" x2="104" y2="80" stroke="#fff5d4" strokeWidth="1" strokeLinecap="round" />
+        <line x1="140" y1="98" x2="142" y2="92" stroke="#fff5d4" strokeWidth="1" strokeLinecap="round" />
+        <line x1="180" y1="80" x2="184" y2="74" stroke="#fff5d4" strokeWidth="1" strokeLinecap="round" />
+      </g>
+      <ellipse cx="234" cy="62" rx="32" ry="28" fill="rgba(0,0,0,0.4)" transform="translate(2,4)" />
+      <ellipse cx="234" cy="62" rx="30" ry="26" fill="url(#snakeHead)" stroke="#9a4a08" strokeWidth="1.5" />
+      <ellipse cx="222" cy="50" rx="9" ry="14" fill="rgba(255,250,210,0.55)" transform="rotate(-15 222 50)" />
+      <ellipse cx="240" cy="56" rx="4" ry="3" fill="url(#snakeSpotG)" opacity="0.7" />
+      <ellipse cx="252" cy="68" rx="3" ry="2" fill="url(#snakeSpotG)" opacity="0.65" />
       <ellipse cx="219" cy="73" rx="6" ry="3.5" fill="#ff7799" opacity="0.85" />
       <ellipse cx="252" cy="73" rx="6" ry="3.5" fill="#ff7799" opacity="0.85" />
       <ellipse cx="219" cy="73" rx="3" ry="1.5" fill="#ffffff" opacity="0.6" />
       <ellipse cx="252" cy="73" rx="3" ry="1.5" fill="#ffffff" opacity="0.6" />
-      <ellipse cx="225" cy="60" rx="7" ry="9" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.6" />
-      <ellipse cx="247" cy="60" rx="7" ry="9" fill="#ffffff" stroke="#1a1a1a" strokeWidth="1.6" />
-      <ellipse cx="226" cy="63" rx="5" ry="6.5" fill="#1a1a1a" />
-      <ellipse cx="247" cy="63" rx="5" ry="6.5" fill="#1a1a1a" />
-      <circle cx="223" cy="59" r="2.4" fill="#ffffff" />
-      <circle cx="245" cy="59" r="2.4" fill="#ffffff" />
-      <circle cx="228" cy="66" r="1.3" fill="#ffffff" opacity="0.85" />
-      <circle cx="249" cy="66" r="1.3" fill="#ffffff" opacity="0.85" />
-      <circle cx="226" cy="56" r="0.7" fill="#ffffff" opacity="0.95" />
-      <circle cx="247" cy="56" r="0.7" fill="#ffffff" opacity="0.95" />
-      <path d="M 222 78 Q 235 87 248 78" stroke="#1a1a1a" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-      <path d="M 230 82 Q 235 86 240 82" stroke="#1a1a1a" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.5" />
-      <path d="M 229 81 Q 235 85 241 81 Q 235 84 229 81 Z" fill="#ff6688" opacity="0.85" />
+      <ellipse cx="225" cy="58" rx="7" ry="9" fill="#ffffff" stroke="#3a1a05" strokeWidth="1.8" />
+      <ellipse cx="247" cy="58" rx="7" ry="9" fill="#ffffff" stroke="#3a1a05" strokeWidth="1.8" />
+      <ellipse cx="226" cy="61" rx="5" ry="6.5" fill="#3a1a05" />
+      <ellipse cx="247" cy="61" rx="5" ry="6.5" fill="#3a1a05" />
+      <circle cx="223" cy="57" r="2.4" fill="#ffffff" />
+      <circle cx="245" cy="57" r="2.4" fill="#ffffff" />
+      <circle cx="228" cy="64" r="1.3" fill="#ffffff" opacity="0.85" />
+      <circle cx="249" cy="64" r="1.3" fill="#ffffff" opacity="0.85" />
+      <circle cx="226" cy="54" r="0.7" fill="#ffffff" opacity="0.95" />
+      <circle cx="247" cy="54" r="0.7" fill="#ffffff" opacity="0.95" />
       <path
-        d="M 264 64 Q 270 62, 274 65 L 270 68 L 278 70 L 270 74 L 274 78 L 264 80"
-        fill="#ff3355"
-        stroke="#aa1133"
+        d="M 222 78 Q 230 88 235 88 Q 240 88 248 78 Q 240 84 235 84 Q 230 84 222 78 Z"
+        fill="#3a1a05"
+        opacity="0.85"
+      />
+      <path
+        d="M 224 79 Q 230 86 235 86 Q 240 86 246 79 Q 240 83 235 83 Q 230 83 224 79 Z"
+        fill="#c8332a"
+        opacity="0.95"
+      />
+      <path
+        d="M 248 82 Q 258 85, 266 82 L 262 86 L 270 87 L 262 90 L 266 94 L 252 92"
+        fill="#d63b30"
+        stroke="#8a1a14"
         strokeWidth="1"
         strokeLinejoin="round"
       />
-      <circle cx="220" cy="34" r="3" fill="#ffd633">
-        <animate attributeName="r" values="3;3.8;3" dur="1.4s" repeatCount="indefinite" />
-        <animate attributeName="opacity" values="0.95;0.6;0.95" dur="1.4s" repeatCount="indefinite" />
-      </circle>
-      <line x1="220" y1="34" x2="226" y2="42" stroke="#ffd63380" strokeWidth="1.2" />
-      <path d="M -2 110 L -14 100 L -10 110 L -14 120 Z" fill="#1f5a1f" />
-      <path d="M -2 110 L -10 104 L -8 110 L -10 116 Z" fill="#5fcf5f" opacity="0.7" />
-      <text x="234" y="92" textAnchor="middle" fontSize="6" fontWeight="bold" fill="#1a1a1a" opacity="0.5">SIS</text>
+      <line x1="262" y1="86" x2="266" y2="82" stroke="#8a1a14" strokeWidth="0.5" opacity="0.6" />
+      <path d="M -2 110 L -14 100 L -10 110 L -14 120 Z" fill="#a85e0a" />
+      <path d="M -2 110 L -10 104 L -8 110 L -10 116 Z" fill="#ffd255" opacity="0.7" />
     </svg>
   );
 }
@@ -1417,7 +1428,7 @@ export default function SolarSystem() {
     'calea-lactee': [659, 784],
     andromeda: [587, 740],
     'galaxia-roata': [698, 880],
-    sarpe: [659, 784],
+    sarpe: [880, 1109],
     pinguin: [988, 1175],
     racheta: [784, 1047],
   };
@@ -2036,18 +2047,18 @@ export default function SolarSystem() {
   const characters = [
     {
       id: 'sarpe',
-      name: 'Sis Șarpele Astronaut',
-      color: '#5fbf5f',
+      name: 'Sis Pitonul Galben',
+      color: '#f4c542',
       iconType: 'snake',
       moons: '0',
-      year: 'Călătoresc de 7 ani',
-      diameter: '1.5 metri lungime',
-      fact: 'Sunt singurul șarpe care a învățat să navigheze printre stele! 🐍✨',
-      description: 'Bună, sunt Sis! Am evadat de la grădina zoologică ca să explorez galaxia. Aici nimeni nu mă mai sperie!',
+      year: 'Are 8 ani și 4 metri',
+      diameter: '4 metri lungime',
+      fact: 'Sunt un piton albinos rar — aurul curge prin solzii mei! Sunt mai prietenos decât par! 🐍✨',
+      description: 'Bună, sunt Sis, pitonul galben cu solzi de aur! Călătoresc prin spațiu și caut prieteni — uite, gura mea e mare ca să-ți zic „salut" mai tare!',
       jokes: [
-        '— De ce ai venit în spațiu? — Pe Pământ toți fugeau de mine. Aici toți zboară! Diferență mare! 🚀',
-        'N-am nevoie de cizme spațiale, oricum n-am picioare! Asta-i singura mea economie! 🤷',
-        '— Cum sări din pat dimineața? — Niciodată. Sunt șarpe, n-am pat, am o casă întreagă pe mine! 🏠',
+        '— De ce sunt galben? — Soarele a stat prea mult pe mine, m-am bronzat! ☀️',
+        'Toți zic că-s lung. Răspund: „Sunt o îmbrățișare lungă, nu un șarpe lung!" 🤗',
+        '— Mușcă? — Nu! Eu doar sărut tare. Foarte tare. De aceea fug oamenii! 😂',
       ],
     },
     {
