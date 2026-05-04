@@ -290,14 +290,16 @@ function RealisticPlanet({ planet, paused }) {
   );
 }
 
+const _isBhMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 const BH_FILAMENTS = (() => {
   let s = 73921;
   const r = () => {
     s = (s * 9301 + 49297) % 233280;
     return s / 233280;
   };
-  return Array.from({ length: 140 }, (_, i) => {
-    const angle = (i / 140) * 360 + (r() * 6 - 3);
+  const count = _isBhMobile ? 60 : 140;
+  return Array.from({ length: count }, (_, i) => {
+    const angle = (i / count) * 360 + (r() * 6 - 3);
     const length = 55 + r() * 75;
     const opacity = 0.08 + r() * 0.42;
     const width = 0.3 + r() * 1.1;
@@ -312,8 +314,9 @@ const BH_FILAMENTS_INNER = (() => {
     s = (s * 9301 + 49297) % 233280;
     return s / 233280;
   };
-  return Array.from({ length: 110 }, (_, i) => {
-    const angle = (i / 110) * 360 + (r() * 6 - 3);
+  const count = _isBhMobile ? 50 : 110;
+  return Array.from({ length: count }, (_, i) => {
+    const angle = (i / count) * 360 + (r() * 6 - 3);
     const length = 25 + r() * 25;
     const opacity = 0.2 + r() * 0.5;
     const width = 0.4 + r() * 0.9;
@@ -497,11 +500,12 @@ function generateGalaxyStars(seed, opts = {}) {
     s = (s * 9301 + 49297) % 233280;
     return s / 233280;
   };
+  const isMob = typeof window !== 'undefined' && window.innerWidth < 768;
   const armCount = opts.armCount ?? 2;
-  const starsPerArm = opts.starsPerArm ?? 240;
-  const bulgeStars = opts.bulgeStars ?? 90;
-  const haloStars = opts.haloStars ?? 80;
-  const dustStars = opts.dustStars ?? 60;
+  const starsPerArm = opts.starsPerArm ?? (isMob ? 100 : 240);
+  const bulgeStars = opts.bulgeStars ?? (isMob ? 40 : 90);
+  const haloStars = opts.haloStars ?? (isMob ? 30 : 80);
+  const dustStars = opts.dustStars ?? (isMob ? 25 : 60);
   const twist = opts.twist ?? Math.PI * 2.5;
   const flatten = opts.flatten ?? 0.92;
   const maxRadius = opts.maxRadius ?? 90;
@@ -1249,7 +1253,12 @@ export default function SolarSystem() {
     });
 
   useEffect(() => {
-    const generated = Array.from({ length: 120 }, () => ({
+    const isMob = typeof window !== 'undefined' && window.innerWidth < 768;
+    const STARS_COUNT = isMob ? 50 : 120;
+    const COMETS_COUNT = isMob ? 25 : 76;
+    const ASTEROIDS_COUNT = isMob ? 30 : 90;
+
+    const generated = Array.from({ length: STARS_COUNT }, () => ({
       top: Math.random() * 100,
       left: Math.random() * 100,
       size: Math.random() * 2 + 1,
@@ -1259,7 +1268,7 @@ export default function SolarSystem() {
     setStars(generated);
 
     const cometColors = ['#fff4a0', '#a8d5ff', '#ffd4a8', '#d8b4ff', '#a0ffd4'];
-    const generatedComets = Array.from({ length: 76 }, () => {
+    const generatedComets = Array.from({ length: COMETS_COUNT }, () => {
       const angle = Math.random() * Math.PI * 2;
       const distance = 80 + Math.random() * 60;
       return {
@@ -1277,7 +1286,7 @@ export default function SolarSystem() {
     });
     setComets(generatedComets);
 
-    const generatedAsteroids = Array.from({ length: 90 }, (_, i) => {
+    const generatedAsteroids = Array.from({ length: ASTEROIDS_COUNT }, (_, i) => {
       const orbitR = 395 + Math.random() * 30;
       const angle = Math.random() * 360;
       const sz = Math.random() * 3 + 1.5;
