@@ -1665,8 +1665,8 @@ export default function SolarSystem() {
       color: '#ffa8e0',
       type: 'galaxy',
       size: 120,
-      top: '5%',
-      left: '3%',
+      top: '24%',
+      left: '2%',
       armColor: '#ffa8d8',
       glowColor: '#ffc8e0',
       coreColor: '#ffe8f0',
@@ -4230,7 +4230,7 @@ export default function SolarSystem() {
       {/* Card cu informații */}
       {selectedPlanet && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-2 md:p-4 overflow-y-auto"
           style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
           onClick={closeCard}
         >
@@ -4264,18 +4264,22 @@ export default function SolarSystem() {
             })}
           </div>
           <div
-            className="relative max-w-md w-full rounded-3xl p-8 text-white"
+            className="relative max-w-md w-full rounded-3xl p-5 md:p-8 text-white my-4 md:my-0"
             onClick={(e) => e.stopPropagation()}
             style={{
               background: 'linear-gradient(145deg, rgba(40,40,80,0.95), rgba(20,20,50,0.95))',
               border: `2px solid ${selectedPlanet.color}`,
               boxShadow: `0 0 40px ${selectedPlanet.color}80, 0 20px 60px rgba(0,0,0,0.5)`,
               animation: 'cardIn 0.4s ease-out',
+              marginTop: 'max(20px, env(safe-area-inset-top))',
+              marginBottom: 'max(20px, env(safe-area-inset-bottom))',
             }}
           >
             <button
               onClick={closeCard}
-              className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10"
+              className="absolute top-3 right-3 text-white bg-black/50 hover:bg-black/70 rounded-full p-2 transition-colors z-20"
+              style={{ minWidth: '40px', minHeight: '40px' }}
+              title="Închide"
             >
               <X size={24} />
             </button>
@@ -4288,8 +4292,8 @@ export default function SolarSystem() {
                   }
                   alert(`Link copiat! 🔗\n${shareUrl}\n\nTrimite-l prietenilor pe WhatsApp!`);
                 }}
-                className="absolute top-4 left-4 text-white/70 hover:text-white text-xs px-2 py-1 rounded-full z-10"
-                style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)' }}
+                className="absolute top-3 left-3 text-white text-xs px-3 py-2 rounded-full z-20"
+                style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.3)' }}
                 title="Copiază link spre acest obiect"
               >
                 🔗 Trimite
@@ -4454,6 +4458,17 @@ export default function SolarSystem() {
                 <div className="font-semibold">{selectedPlanet.moons}</div>
               </div>
             </div>
+            <button
+              onClick={closeCard}
+              className="mt-5 w-full py-3 rounded-2xl font-bold text-base transition-all"
+              style={{
+                background: `${selectedPlanet.color}40`,
+                border: `2px solid ${selectedPlanet.color}`,
+                color: '#fff',
+              }}
+            >
+              ✕ Închide
+            </button>
           </div>
         </div>
       )}
