@@ -3,6 +3,12 @@
 Toate modificările notabile ale prototipului. Datele din catalog sunt
 **orientative** (nivel catalog), nu înlocuiesc fișele tehnice oficiale.
 
+## [0.6.0] — 2026-05-16 — Tab Ghid + mod dark
+- Tab nou **Ghid**: instrucțiuni de utilizare pentru fiecare secțiune.
+- **Mod dark** comutabil din antet (☀/☾), persistat în `localStorage`,
+  cu fallback pe preferința sistemului. Implementat prin override de
+  temă în `index.css` (fără a modifica clasele din componentă).
+
 ## [0.5.1] — 2026-05-16 — Remedieri audit (toate)
 - Dedupe la nivel de `uid` în `buildCatalog` (ultimul câștigă) + warn;
   intrările `equipment` fără câmpuri obligatorii sunt ignorate cu warn.

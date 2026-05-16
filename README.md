@@ -28,7 +28,9 @@ pagina și apar. Structura: `domains`, `categories` (cu `specs`),
 - 📋 Proiect cu cantități + totaluri, export CSV / PDF și partajare prin link
 - 🗂️ Tab „Catalog": încarci un `catalog.json` propriu sau imporți din CSV
   direct din aplicație (fără rebuild); alegerea se reține local
-- 📱 Interfață mobile-first, cu navigare jos (Caută / Asistent / Proiect / Catalog)
+- 📖 Tab „Ghid" cu instrucțiuni de utilizare
+- 🌙 Mod dark comutabil din antet (se reține)
+- 📱 Interfață mobile-first, cu navigare jos (Caută / Asistent / Proiect / Catalog / Ghid)
 
 ## Rulare locală
 

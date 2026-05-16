@@ -5,6 +5,7 @@ import {
   Search, Star, SlidersHorizontal, Scale, FolderOpen, Download,
   Copy, X, ExternalLink, Wand2, Trash2, Building2, Check, ArrowDownUp,
   Printer, Link2, Minus, Plus, Database, Upload, RotateCcw,
+  BookOpen, Sun, Moon,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -183,6 +184,27 @@ function useProject() {
     setQty((p) => ({ ...p, [uid]: Math.max(1, Math.floor(Number(v) || 1)) }));
   const clear = () => setQty({});
   return { qty, has, toggle, setOne, clear };
+}
+
+function useTheme() {
+  const [dark, setDark] = useState(() => {
+    try {
+      const s = localStorage.getItem('instalfinder.theme');
+      if (s) return s === 'dark';
+      return window.matchMedia?.('(prefers-color-scheme: dark)').matches || false;
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark);
+    try {
+      localStorage.setItem('instalfinder.theme', dark ? 'dark' : 'light');
+    } catch {
+      /* ignore */
+    }
+  }, [dark]);
+  return [dark, () => setDark((d) => !d)];
 }
 
 /* ------------------------------------------------------------------ */
@@ -1188,17 +1210,87 @@ function DataTab() {
 }
 
 /* ------------------------------------------------------------------ */
+function GuideStep({ icon: Icon, title, children }) {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-4">
+      <h3 className="font-bold text-slate-900 flex items-center gap-2">
+        <Icon size={17} className="text-sky-600" /> {title}
+      </h3>
+      <div className="mt-1.5 text-sm text-slate-600 space-y-1.5">{children}</div>
+    </div>
+  );
+}
+
+function GuideTab() {
+  const { equipment } = useCatalog();
+  return (
+    <div className="pb-24 space-y-3">
+      <div>
+        <h2 className="font-bold text-slate-900">Ghid de utilizare</h2>
+        <p className="text-sm text-slate-500 mt-1">
+          InstalFinder caută și compară echipamente de instalații după parametri
+          tehnici. Datele sunt orientative — verifică fișa oficială a producătorului.
+        </p>
+      </div>
+
+      <GuideStep icon={Search} title="Caută">
+        <p>Alege întâi <strong>Specialitatea</strong> (Sanitare, Termice, Electrice,
+          HVAC, Incendiu), apoi <strong>Tipul de echipament</strong>.</p>
+        <p>Scrie în câmpul de căutare după producător sau model. Apasă{' '}
+          <strong>Filtre</strong> pentru intervale min–max pe parametri și folosește
+          lista de <strong>sortare</strong> (relevanță, producător, model, sau orice
+          parametru ↑↓).</p>
+        <p>Apasă un card sau <strong>Detalii</strong> pentru toate specificațiile.</p>
+      </GuideStep>
+
+      <GuideStep icon={Wand2} title="Asistent de selecție">
+        <p>Alege specialitatea și tipul, introdu <strong>punctul de funcționare</strong>
+          dorit (ex. debit + înălțime). Primești echipamentele apropiate, ordonate
+          după <strong>% de potrivire</strong>.</p>
+      </GuideStep>
+
+      <GuideStep icon={Scale} title="Comparație">
+        <p>Bifează <strong>Compară</strong> pe câteva echipamente, apoi apasă bara
+          <strong> Compară</strong> de jos pentru tabelul alăturat, spec cu spec.</p>
+      </GuideStep>
+
+      <GuideStep icon={FolderOpen} title="Proiect">
+        <p>Apasă ⭐ ca să adaugi în proiect. În tab-ul <strong>Proiect</strong> setezi
+          <strong> cantități</strong>, vezi totalurile și exporți: <strong>CSV</strong>,
+          <strong> PDF</strong> (printabil) sau <strong>Link</strong> (proiectul codat
+          în adresă, se adaugă la deschidere). Lista se salvează local pe dispozitiv.</p>
+      </GuideStep>
+
+      <GuideStep icon={Database} title="Catalog (date proprii)">
+        <p>Catalogul actual are <strong>{equipment.length} echipamente</strong>. Poți
+          încărca un <code>catalog.json</code> propriu sau importa din{' '}
+          <strong>CSV</strong> (<code>category;manufacturer;model;specs</code>) fără
+          rebuild. Folosește „Model CSV" ca șablon și „Catalog implicit" pentru revenire.</p>
+      </GuideStep>
+
+      <GuideStep icon={Moon} title="Temă & date">
+        <p>Comutatorul ☀/☾ din antet schimbă <strong>tema luminoasă/întunecată</strong>
+          (se reține). Specificațiile sunt <strong>orientative</strong>, la nivel de
+          catalog — nu înlocuiesc fișele tehnice oficiale.</p>
+      </GuideStep>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 const TABS = [
   { key: 'search', label: 'Caută', icon: Search },
   { key: 'assistant', label: 'Asistent', icon: Wand2 },
   { key: 'project', label: 'Proiect', icon: FolderOpen },
   { key: 'data', label: 'Catalog', icon: Database },
+  { key: 'guide', label: 'Ghid', icon: BookOpen },
 ];
 
 function AppShell() {
   const { equipment } = useCatalog();
   const [tab, setTab] = useState('search');
   const project = useProject();
+  const [dark, toggleDark] = useTheme();
   const [compareSet, toggleCompare, setCompareSet] = useLocalSet('instalfinder.compare');
   const [showCompare, setShowCompare] = useState(false);
   const [showBanner, setShowBanner] = useState(() => {
@@ -1223,11 +1315,20 @@ function AppShell() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <header className="bg-gradient-to-r from-sky-700 to-cyan-600 text-white">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <h1 className="text-xl font-extrabold tracking-tight">InstalFinder</h1>
-          <p className="text-sky-100 text-sm">
-            Echipamente pentru instalații — sanitare, termice, electrice, HVAC, incendiu
-          </p>
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl font-extrabold tracking-tight">InstalFinder</h1>
+            <p className="text-sky-100 text-sm">
+              Echipamente pentru instalații — sanitare, termice, electrice, HVAC, incendiu
+            </p>
+          </div>
+          <button
+            onClick={toggleDark}
+            aria-label={dark ? 'Temă luminoasă' : 'Temă întunecată'}
+            className="shrink-0 p-2 rounded-full bg-white/15 hover:bg-white/25 transition"
+          >
+            {dark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
         </div>
       </header>
 
@@ -1262,6 +1363,7 @@ function AppShell() {
         {tab === 'assistant' && <AssistantTab saved={project} onSave={project.toggle} />}
         {tab === 'project' && <ProjectTab project={project} />}
         {tab === 'data' && <DataTab />}
+        {tab === 'guide' && <GuideTab />}
       </main>
 
       {compareItems.length > 0 && tab === 'search' && (
@@ -1289,7 +1391,7 @@ function AppShell() {
       )}
 
       <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-30">
-        <div className="max-w-3xl mx-auto grid grid-cols-4">
+        <div className="max-w-3xl mx-auto grid grid-cols-5">
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = tab === t.key;
