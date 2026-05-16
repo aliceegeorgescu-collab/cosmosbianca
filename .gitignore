@@ -5,7 +5,7 @@ dist/
 .DS_Store
 .vscode/
 .idea/
-site.zip
+*.zip
 .env
 .env.local
 .env.*.local
