@@ -1,8 +1,10 @@
-import React, { useMemo, useState, useEffect, useContext, createContext } from 'react';
+import React, {
+  useMemo, useState, useEffect, useCallback, useContext, createContext,
+} from 'react';
 import {
   Search, Star, SlidersHorizontal, Scale, FolderOpen, Download,
   Copy, X, ExternalLink, Wand2, Trash2, Building2, Check, ArrowDownUp,
-  Printer, Link2, Minus, Plus,
+  Printer, Link2, Minus, Plus, Database, Upload, RotateCcw,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -47,6 +49,47 @@ const encodeProject = (obj) =>
   encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(obj)))));
 const decodeProject = (s) =>
   JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(s)))));
+
+/* CSV: prima linie antet cu coloanele category;manufacturer;model;specs    */
+/* specs = "cheie:valoare|cheie:valoare" (valorile numerice sunt detectate) */
+function parseEquipmentCSV(text) {
+  const lines = text
+    .replace(/\r/g, '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (lines.length < 2) return [];
+  const sep = lines[0].includes(';') ? ';' : ',';
+  const head = lines[0].split(sep).map((h) => h.trim().toLowerCase());
+  const ix = (name) => head.indexOf(name);
+  const ci = ix('category');
+  const mi = ix('manufacturer');
+  const oi = ix('model');
+  const si = ix('specs');
+  if (ci < 0 || mi < 0 || oi < 0) return [];
+  const out = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i].split(sep).map((c) => c.trim().replace(/^"|"$/g, ''));
+    const category = cells[ci];
+    const manufacturer = cells[mi];
+    const model = cells[oi];
+    if (!category || !manufacturer || !model) continue;
+    const specs = {};
+    if (si >= 0 && cells[si]) {
+      for (const pair of cells[si].split('|')) {
+        const idx = pair.indexOf(':');
+        if (idx < 0) continue;
+        const k = pair.slice(0, idx).trim();
+        const raw = pair.slice(idx + 1).trim();
+        if (!k) continue;
+        const num = Number(raw);
+        specs[k] = raw !== '' && !Number.isNaN(num) ? num : raw;
+      }
+    }
+    out.push({ category, manufacturer, model, specs });
+  }
+  return out;
+}
 
 function useLocalSet(key) {
   const [set, setSet] = useState(() => {
@@ -953,10 +996,170 @@ function ProjectTab({ project }) {
 }
 
 /* ------------------------------------------------------------------ */
+function DataTab() {
+  const { raw, source, categories, domMap, equipment, applyRaw, resetCatalog } = useCatalog();
+  const [msg, setMsg] = useState(null);
+  const catKeys = new Set(categories.map((c) => c.key));
+
+  const loadJSON = (file) => {
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const parsed = JSON.parse(String(r.result));
+        if (!Array.isArray(parsed.categories) || !Array.isArray(parsed.equipment)) {
+          throw new Error('lipsesc „categories" sau „equipment"');
+        }
+        applyRaw(parsed, true);
+        setMsg({ ok: true, text: `Catalog încărcat: ${parsed.equipment.length} echipamente.` });
+      } catch (e) {
+        setMsg({ ok: false, text: `JSON invalid: ${e.message}` });
+      }
+    };
+    r.readAsText(file);
+  };
+
+  const importCSV = (file) => {
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      const rows = parseEquipmentCSV(String(r.result));
+      if (rows.length === 0) {
+        setMsg({ ok: false, text: 'CSV gol sau antet lipsă (category;manufacturer;model;specs).' });
+        return;
+      }
+      const valid = rows.filter((x) => catKeys.has(x.category));
+      const skipped = rows.length - valid.length;
+      if (valid.length === 0) {
+        setMsg({ ok: false, text: 'Nicio linie validă — verifică coloana „category".' });
+        return;
+      }
+      applyRaw({ ...raw, equipment: [...(raw.equipment || []), ...valid] }, true);
+      setMsg({
+        ok: true,
+        text: `Adăugate ${valid.length} echipamente${skipped ? `, ${skipped} ignorate (categorie necunoscută)` : ''}.`,
+      });
+    };
+    r.readAsText(file);
+  };
+
+  const downloadTemplate = () => {
+    const sample =
+      'category;manufacturer;model;specs\n' +
+      'pompa;Grundfos;Exemplu 32-60;debit:9|inaltime:6|putere:110|conexiune:DN32';
+    const blob = new Blob(['﻿' + sample], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'model-import.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  return (
+    <div className="pb-24">
+      <h2 className="font-bold text-slate-900">Catalog</h2>
+      <p className="text-sm text-slate-500 mt-1">
+        Sursă:{' '}
+        <span
+          className={cls(
+            'font-semibold',
+            source === 'personalizat' ? 'text-amber-600' : 'text-emerald-600',
+          )}
+        >
+          {source === 'personalizat' ? 'personalizat (din aplicație)' : 'implicit (catalog.json)'}
+        </span>{' '}
+        · {equipment.length} echipamente · {categories.length} tipuri
+      </p>
+
+      {msg && (
+        <div
+          className={cls(
+            'mt-3 text-sm rounded-xl p-3 border',
+            msg.ok
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+              : 'bg-rose-50 border-rose-200 text-rose-700',
+          )}
+        >
+          {msg.text}
+        </div>
+      )}
+
+      <div className="mt-4 space-y-3">
+        <label className="block bg-white border border-slate-200 rounded-2xl p-4 cursor-pointer">
+          <div className="font-semibold text-slate-900 flex items-center gap-2">
+            <Upload size={16} /> Încarcă catalog.json (înlocuiește tot)
+          </div>
+          <p className="text-xs text-slate-500 mt-1">
+            Același format ca <code>public/catalog.json</code>. Se salvează local.
+          </p>
+          <input
+            type="file"
+            accept=".json,application/json"
+            className="hidden"
+            onChange={(e) => loadJSON(e.target.files?.[0])}
+          />
+        </label>
+
+        <label className="block bg-white border border-slate-200 rounded-2xl p-4 cursor-pointer">
+          <div className="font-semibold text-slate-900 flex items-center gap-2">
+            <Upload size={16} /> Import CSV (adaugă echipamente)
+          </div>
+          <p className="text-xs text-slate-500 mt-1">
+            Antet: <code>category;manufacturer;model;specs</code> — unde specs e{' '}
+            <code>cheie:valoare|cheie:valoare</code>.
+          </p>
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(e) => importCSV(e.target.files?.[0])}
+          />
+        </label>
+
+        <div className="flex gap-2">
+          <button
+            onClick={downloadTemplate}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-white border border-slate-200 text-slate-700 font-medium py-2.5 rounded-xl text-sm"
+          >
+            <Download size={16} /> Model CSV
+          </button>
+          {source === 'personalizat' && (
+            <button
+              onClick={() => {
+                resetCatalog();
+                setMsg({ ok: true, text: 'Revenit la catalogul implicit.' });
+              }}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 bg-white border border-slate-200 text-rose-600 font-medium py-2.5 rounded-xl text-sm"
+            >
+              <RotateCcw size={16} /> Catalog implicit
+            </button>
+          )}
+        </div>
+      </div>
+
+      <p className="mt-5 text-[11px] font-semibold uppercase tracking-wide text-slate-400 mb-2">
+        Chei de categorie disponibile
+      </p>
+      <div className="bg-white border border-slate-200 rounded-2xl p-3 text-xs text-slate-600 space-y-1">
+        {categories.map((c) => (
+          <div key={c.key} className="flex justify-between gap-3">
+            <code className="text-slate-800">{c.key}</code>
+            <span className="text-slate-500 text-right">
+              {domMap[c.domain]?.label} · {c.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 const TABS = [
   { key: 'search', label: 'Caută', icon: Search },
   { key: 'assistant', label: 'Asistent', icon: Wand2 },
   { key: 'project', label: 'Proiect', icon: FolderOpen },
+  { key: 'data', label: 'Catalog', icon: Database },
 ];
 
 function AppShell() {
@@ -1024,6 +1227,7 @@ function AppShell() {
         )}
         {tab === 'assistant' && <AssistantTab saved={project} onSave={project.toggle} />}
         {tab === 'project' && <ProjectTab project={project} />}
+        {tab === 'data' && <DataTab />}
       </main>
 
       {compareItems.length > 0 && tab === 'search' && (
@@ -1051,7 +1255,7 @@ function AppShell() {
       )}
 
       <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-30">
-        <div className="max-w-3xl mx-auto grid grid-cols-3">
+        <div className="max-w-3xl mx-auto grid grid-cols-4">
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = tab === t.key;
@@ -1091,18 +1295,64 @@ function Centered({ children }) {
 
 export default function EquipmentApp() {
   const [catalog, setCatalog] = useState(null);
+  const [raw, setRaw] = useState(null);
+  const [source, setSource] = useState('implicit');
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const applyRaw = useCallback((rawObj, persist) => {
+    const built = buildCatalog(rawObj);
+    setRaw(rawObj);
+    setCatalog(built);
+    if (persist) {
+      try {
+        localStorage.setItem('instalfinder.catalog', JSON.stringify(rawObj));
+      } catch {
+        /* ignore */
+      }
+      setSource('personalizat');
+    }
+  }, []);
+
+  const loadDefault = useCallback(() => {
     const url = `${import.meta.env.BASE_URL}catalog.json`;
     fetch(url)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       })
-      .then((raw) => setCatalog(buildCatalog(raw)))
+      .then((rawObj) => {
+        setRaw(rawObj);
+        setCatalog(buildCatalog(rawObj));
+        setSource('implicit');
+      })
       .catch((e) => setError(e.message || String(e)));
   }, []);
+
+  const resetCatalog = useCallback(() => {
+    try {
+      localStorage.removeItem('instalfinder.catalog');
+    } catch {
+      /* ignore */
+    }
+    loadDefault();
+  }, [loadDefault]);
+
+  useEffect(() => {
+    let override = null;
+    try {
+      const s = localStorage.getItem('instalfinder.catalog');
+      if (s) override = JSON.parse(s);
+    } catch {
+      /* ignore */
+    }
+    if (override && Array.isArray(override.categories)) {
+      setRaw(override);
+      setCatalog(buildCatalog(override));
+      setSource('personalizat');
+      return;
+    }
+    loadDefault();
+  }, [loadDefault]);
 
   if (error) {
     return (
@@ -1125,7 +1375,7 @@ export default function EquipmentApp() {
   }
 
   return (
-    <CatalogCtx.Provider value={catalog}>
+    <CatalogCtx.Provider value={{ ...catalog, raw, source, applyRaw, resetCatalog }}>
       <AppShell />
     </CatalogCtx.Provider>
   );

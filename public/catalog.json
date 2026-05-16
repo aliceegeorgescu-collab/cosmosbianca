@@ -35,7 +35,17 @@
     "S&P": "https://www.solerpalau.com",
     "Vortice": "https://www.vortice.com",
     "Tyco": "https://www.tyco-fire.com",
-    "Viking": "https://www.vikinggroupinc.com"
+    "Viking": "https://www.vikinggroupinc.com",
+    "Buderus": "https://www.buderus.com",
+    "Immergas": "https://www.immergas.com",
+    "Motan": "https://www.motan.ro",
+    "Saunier Duval": "https://www.saunierduval.com",
+    "Lowara": "https://www.lowara.com",
+    "Pedrollo": "https://www.pedrollo.com",
+    "Mitsubishi Electric": "https://www.mitsubishielectric.com",
+    "Panasonic": "https://www.panasonic.com",
+    "Caleffi": "https://www.caleffi.com",
+    "Danfoss": "https://www.danfoss.com"
   },
   "categories": [
     {
@@ -314,6 +324,47 @@
     { "manufacturer": "Viking", "category": "sprinkler", "model": "VK102 K115", "specs": { "k": 115, "tdecl": 68, "orientare": "Upright", "racord": "3/4\"" } },
 
     { "manufacturer": "Grundfos", "category": "pompa_incendiu", "model": "NK 50", "specs": { "debit": 50, "inaltime": 60, "putere": 18.5, "tip": "Centrifugă" } },
-    { "manufacturer": "Wilo", "category": "pompa_incendiu", "model": "SiFire End 90", "specs": { "debit": 90, "inaltime": 75, "putere": 30, "tip": "Grup pompare" } }
+    { "manufacturer": "Wilo", "category": "pompa_incendiu", "model": "SiFire End 90", "specs": { "debit": 90, "inaltime": 75, "putere": 30, "tip": "Grup pompare" } },
+
+    { "manufacturer": "Pedrollo", "category": "pompa_apa", "model": "PKm 60", "specs": { "debit": 2.4, "inaltime": 40, "putere": 370, "conexiune": "1\"" } },
+    { "manufacturer": "Lowara", "category": "pompa_apa", "model": "BGM 5", "specs": { "debit": 3, "inaltime": 35, "putere": 550, "conexiune": "1\"" } },
+    { "manufacturer": "Buderus", "category": "boiler", "model": "Logalux SU160", "specs": { "volum": 160, "serpentine": 1, "pmax": 10, "material": "Oțel emailat" } },
+    { "manufacturer": "Bosch", "category": "boiler", "model": "WSTB 300", "specs": { "volum": 300, "serpentine": 2, "pmax": 10, "material": "Oțel emailat" } },
+
+    { "manufacturer": "Buderus", "category": "centrala", "model": "Logamax plus GB172 24", "specs": { "putere": 24, "combustibil": "Gaz", "randament": 98, "acm": 11 } },
+    { "manufacturer": "Immergas", "category": "centrala", "model": "Victrix Exa 28", "specs": { "putere": 28, "combustibil": "Gaz", "randament": 97, "acm": 13 } },
+    { "manufacturer": "Motan", "category": "centrala", "model": "MKDENS 25", "specs": { "putere": 25, "combustibil": "Gaz", "randament": 96, "acm": 12 } },
+    { "manufacturer": "Saunier Duval", "category": "centrala", "model": "ThemaFast Condens 30", "specs": { "putere": 30, "combustibil": "Gaz", "randament": 97, "acm": 14 } },
+
+    { "manufacturer": "Mitsubishi Electric", "category": "pompacaldura", "model": "Ecodan 8.5 kW", "specs": { "putere": 8.5, "cop": 4.5, "scop": 4.2, "tip": "Aer-apă" } },
+    { "manufacturer": "Panasonic", "category": "pompacaldura", "model": "Aquarea T-CAP 9 kW", "specs": { "putere": 9, "cop": 4.6, "scop": 4.4, "tip": "Aer-apă" } },
+
+    { "manufacturer": "Grundfos", "category": "pompa", "model": "UPS 25-60", "specs": { "debit": 3.5, "inaltime": 6, "putere": 90, "conexiune": "DN25" } },
+    { "manufacturer": "Wilo", "category": "pompa", "model": "Yonos PICO 25/1-6", "specs": { "debit": 3, "inaltime": 6, "putere": 30, "conexiune": "DN25" } },
+
+    { "manufacturer": "Alfa Laval", "category": "schimbator", "model": "CB76", "specs": { "putere": 150, "debit": 6.5, "placi": 60, "pmax": 16 } },
+    { "manufacturer": "Caleffi", "category": "vas", "model": "558 25 l", "specs": { "volum": 25, "pmax": 10, "tip": "Închis cu membrană", "racord": "3/4\"" } },
+    { "manufacturer": "Zilmet", "category": "vas", "model": "Cal-Pro 50", "specs": { "volum": 50, "pmax": 6, "tip": "Închis cu membrană", "racord": "3/4\"" } },
+
+    { "manufacturer": "Schneider Electric", "category": "tablou", "model": "Resi9 13M", "specs": { "curent": 40, "circuite": 13, "ip": "IP40", "montaj": "Aparent" } },
+    { "manufacturer": "ABB", "category": "tablou", "model": "Mistral41 24M", "specs": { "curent": 63, "circuite": 24, "ip": "IP41", "montaj": "Aparent" } },
+    { "manufacturer": "Legrand", "category": "mcb", "model": "DX3 C20 1P", "specs": { "curent": 20, "poli": 1, "curba": "C", "capacitate": 6 } },
+    { "manufacturer": "Eaton", "category": "mcb", "model": "PLSM C16 3P", "specs": { "curent": 16, "poli": 3, "curba": "C", "capacitate": 10 } },
+
+    { "manufacturer": "Prysmian", "category": "cablu", "model": "CYABY 4x10", "specs": { "sectiune": 10, "conductoare": 4, "tip": "CYABY", "tensiune": 1000 } },
+    { "manufacturer": "Nexans", "category": "cablu", "model": "H07V-K 2.5", "specs": { "sectiune": 2.5, "conductoare": 1, "tip": "H07V-K", "tensiune": 750 } },
+    { "manufacturer": "Eaton", "category": "ups", "model": "9SX 2000i", "specs": { "putere": 2000, "autonomie": 9, "topologie": "On-line", "iesiri": "IEC C13" } },
+    { "manufacturer": "APC", "category": "ups", "model": "Back-UPS BX950", "specs": { "putere": 950, "autonomie": 5, "topologie": "Line-interactive", "iesiri": "Schuko" } },
+
+    { "manufacturer": "Carrier", "category": "chiller", "model": "30RB 40", "specs": { "frig": 40, "eer": 3.0, "seer": 4.0, "agent": "R-410A" } },
+    { "manufacturer": "Daikin", "category": "ventilo", "model": "FWV 6", "specs": { "frig": 6.0, "caldura": 7.5, "aer": 1050, "montaj": "Carcasat" } },
+    { "manufacturer": "Systemair", "category": "cta", "model": "Geniox 12", "specs": { "aer": 8000, "recuperare": 82, "putere": 14, "filtrare": "ePM1 60%" } },
+    { "manufacturer": "Vortice", "category": "ventilator", "model": "CA 150 MD", "specs": { "aer": 600, "presiune": 250, "putere": 85, "tip": "Centrifugal" } },
+
+    { "manufacturer": "Bosch", "category": "detector", "model": "FAH-T termic", "specs": { "acoperire": 30, "tip": "Termic", "tensiune": 24, "interfata": "Adresabil" } },
+    { "manufacturer": "Bosch", "category": "centrala_psi", "model": "FPA-5000", "specs": { "bucle": 8, "zone": 128, "tip": "Adresabilă", "iesiri": 16 } },
+    { "manufacturer": "Tyco", "category": "hidrant", "model": "Hidrant exterior DN80", "specs": { "debit": 1000, "presiune": 6, "dn": "DN80", "furtun": 0 } },
+    { "manufacturer": "Viking", "category": "sprinkler", "model": "VK302 K80 QR", "specs": { "k": 80, "tdecl": 57, "orientare": "Pendent", "racord": "1/2\"" } },
+    { "manufacturer": "Grundfos", "category": "pompa_incendiu", "model": "NB 65", "specs": { "debit": 65, "inaltime": 70, "putere": 22, "tip": "Centrifugă" } }
   ]
 }
