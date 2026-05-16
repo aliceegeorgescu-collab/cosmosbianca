@@ -5,23 +5,55 @@
 html, body, #root {
   margin: 0;
   padding: 0;
-  background: #000;
   overflow-x: hidden;
 }
 
-@media (min-width: 768px) {
-  html, body, #root {
-    height: 100%;
-    overflow-y: hidden;
-  }
+body {
+  -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 767px) {
-  html, body {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  #root {
-    min-height: 100%;
-  }
+/* ---- Temă dark (override pe clasele neutre folosite în UI) ---- */
+html.dark {
+  color-scheme: dark;
 }
+html.dark body {
+  background: #0f172a;
+}
+
+html.dark .bg-white { background-color: #1e293b !important; }
+html.dark .bg-slate-50 { background-color: #0f172a !important; }
+html.dark .bg-slate-100 { background-color: #334155 !important; }
+html.dark .bg-slate-900 { background-color: #0284c7 !important; }
+
+html.dark .text-slate-900 { color: #f1f5f9 !important; }
+html.dark .text-slate-800 { color: #e2e8f0 !important; }
+html.dark .text-slate-700 { color: #cbd5e1 !important; }
+html.dark .text-slate-600 { color: #cbd5e1 !important; }
+html.dark .text-slate-500 { color: #94a3b8 !important; }
+html.dark .text-slate-400 { color: #64748b !important; }
+html.dark .text-slate-300 { color: #475569 !important; }
+
+html.dark .border-slate-200 { border-color: #334155 !important; }
+html.dark .border-slate-100 { border-color: #1e293b !important; }
+html.dark .border-slate-900 { border-color: #0284c7 !important; }
+
+/* accente soft */
+html.dark .bg-sky-50 { background-color: #0c2a3d !important; }
+html.dark .text-sky-700 { color: #38bdf8 !important; }
+html.dark .text-sky-900 { color: #7dd3fc !important; }
+html.dark .text-sky-600 { color: #38bdf8 !important; }
+
+html.dark .bg-amber-50 { background-color: #3f2d0b !important; }
+html.dark .border-amber-200 { border-color: #78510f !important; }
+html.dark .text-amber-800 { color: #fcd34d !important; }
+html.dark .text-amber-700 { color: #fcd34d !important; }
+html.dark .text-amber-950 { color: #fde68a !important; }
+
+html.dark .bg-emerald-50 { background-color: #0c2f22 !important; }
+html.dark .border-emerald-200 { border-color: #14532d !important; }
+html.dark .text-emerald-700 { color: #6ee7b7 !important; }
+
+html.dark .bg-rose-50 { background-color: #3a0f17 !important; }
+html.dark .border-rose-200 { border-color: #7f1d1d !important; }
+html.dark .border-rose-300 { border-color: #9f1239 !important; }
+html.dark .text-rose-700 { color: #fda4af !important; }

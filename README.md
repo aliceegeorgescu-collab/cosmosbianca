@@ -1,22 +1,40 @@
-# 🌌 Sistemul Solar Interactiv
+# InstalFinder — Căutare echipamente instalații
 
-Aplicație educativă în română pentru copii — descoperă universul nostru cu planete realiste, gaură neagră, galaxii, zodii, jocuri și narațiune cu voce.
+Prototip de aplicație (web, mobile-first) pentru ingineri/proiectanți de
+instalații: caută și compară echipamente de la producători după parametri
+tehnici, organizate pe specialități — **Sanitare, Termice, Electrice, HVAC,
+Incendiu**.
+
+> ⚠️ **Date orientative.** Specificațiile sunt la nivel de catalog, pentru
+> prototip — nu înlocuiesc fișele tehnice oficiale ale producătorilor.
+> A nu se folosi pentru proiectare fără verificare.
+
+## Date editabile — `public/catalog.json`
+
+Tot catalogul (specialități, tipuri de echipament, producători, echipamente)
+se încarcă la pornire din `public/catalog.json`. Poți **adăuga / modifica /
+înlocui** echipamente direct în acel fișier, fără a atinge codul — reîncarci
+pagina și apar. Structura: `domains`, `categories` (cu `specs`),
+`manufacturers`, `equipment`.
 
 ## Funcționalități
 
-- 🪐 9 planete (cu Pluto) + Soarele, fiecare cu suprafața detaliată, descriere, fapte amuzante și 3 glume
-- 🌙 Luni proprii pentru fiecare planetă (Luna, Io, Europa, Titan, etc.)
-- ☄️ Centură de asteroizi între Marte și Jupiter, Cometa Halley pe orbita ei
-- 🛰️ Stația Spațială Internațională orbitând Pământul, sondele Voyager 1 & 2 în spațiul interstelar
-- 🕳️ Gaură neagră realistă (stil Interstellar) cu disc de acreție și inel de fotoni
-- 🌌 3 galaxii spirale (Calea Lactee, Andromeda, Galaxia Roată) cu brațe procedurale
-- ⭐ 12 constelații zodiacale clickabile (Berbec, Taur, ..., Pești)
-- 🐍🐧🚀 Personaje (Sis Șarpele, Pip Pinguinul, Racheta) cu glume
-- 🎬 Tur ghidat audio · 🎶 Muzică ambientală · 🎯 Quiz · 🎨 Mod desenează planeta ta
-- 🃏 Memory Match · 📏 Sortează planetele · 📅 Provocare zilnică · 🎴 Galerie stickere · 🎙️ Mod poveste
-- 🌗 Zi/noapte pe Pământ · 🌌 Aurora boreală · 🛸 OZN-uri ocazionale · ⭐ Stele cu dorință
-- 🎂 Calculator vârstă pe planete · 💾 Salvare progres · 🔗 Share link
-- 🎙️ Voce românească (Web Speech / Google Translate TTS)
+- 🧭 Filtru pe specialitate → tip echipament (două niveluri)
+- 🔎 Căutare cu filtre interval (min–max), sortare și rezultate grupate;
+  fișă detaliată per echipament
+- 🌐 „Caută pe net" — dacă un echipament nu e în catalog, deschide o căutare
+  web pre-completată (pe card / în detalii / la zero rezultate)
+- 🪄 Asistent de selecție — introduci punctul de funcționare, primești cele
+  mai apropiate echipamente, ordonate după % de potrivire
+- ⚖️ Comparație side-by-side a echipamentelor selectate
+- 📋 Proiect cu cantități + totaluri, export CSV / PDF și partajare prin link
+- 📄 Tab „F5" (licitații): lipești/încarci tabelul F5, detectează cerințele,
+  caută în catalog echipamentul conform și exportă tabelul Cerut vs. Ofertat
+- 🗂️ Tab „Catalog": încarci un `catalog.json` propriu sau imporți din CSV
+  direct din aplicație (fără rebuild); alegerea se reține local
+- 📖 Tab „Ghid" cu instrucțiuni de utilizare
+- 🌙 Mod dark comutabil din antet (se reține)
+- 📱 Interfață mobile-first, cu navigare jos (Caută / Asistent / Proiect / F5 / Catalog / Ghid)
 
 ## Rulare locală
 
@@ -25,20 +43,31 @@ npm install
 npm run dev
 ```
 
-Aplicația se deschide la `http://localhost:5173/`.
+Aplicația se deschide la `http://localhost:5173/` (server de dezvoltare
+restrâns la `127.0.0.1` — privat, doar pe acest dispozitiv). Service
+worker-ul rulează și în `dev`.
 
-## Build pentru producție
+## Privat & instalabil (PWA)
+
+Aplicația este **privată** — nu este publicată nicăieri (nu există workflow de
+deploy). Rulează doar pe dispozitivul tău.
+
+E o **PWA**: după `npm run build` și servire locală (`npm run preview`), din
+Chrome/Edge → meniu → **Instalează**. Apare cu iconiță proprie și **merge
+offline** (aplicația + `catalog.json` sunt în cache prin service worker).
+Pe `localhost` instalarea funcționează fără HTTPS.
 
 ```bash
 npm run build
+npm run preview   # apoi „Instalează" din browser
 ```
 
-Fișierele rezultate sunt în `dist/`.
+Fișierele rezultate sunt în `dist/` (include `manifest.webmanifest` și `sw.js`).
 
 ## Tehnologii
 
 - React 18 + Vite 5
 - Tailwind CSS 3
-- Web Audio API (pentru muzică ambientală + clinchete)
-- Web Speech API + Google Translate TTS (pentru narațiune)
-- SVG inline (pentru toate vizualele realiste)
+- lucide-react (iconițe)
+
+Punctul de intrare este `src/main.jsx` → `src/EquipmentApp.jsx`.

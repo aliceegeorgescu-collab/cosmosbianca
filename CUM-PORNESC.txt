@@ -1,0 +1,83 @@
+============================================
+  InstalFinder — CUM PORNESC (pas cu pas)
+============================================
+
+O SINGURĂ DATĂ PE LAPTOP
+------------------------
+1) Instalează Node.js:
+   - intră pe nodejs.org
+   - descarcă versiunea "LTS"
+   - instaleaz-o normal (Next → Next → Finish)
+   - (dacă e cazul, repornește laptopul după instalare)
+
+2) Dezarhivează "instalfinder.zip" (click-dreapta → Extract).
+   Vei avea un folder, ex. "instalfinder".
+
+
+DESCHIDE TERMINALUL ÎN FOLDER
+-----------------------------
+Windows: intră în folder, click pe bara de adrese de sus,
+         scrie:  cmd   și apasă Enter.
+Mac:     deschide aplicația "Terminal", scrie:  cd   (cu spațiu),
+         trage folderul peste fereastră, apasă Enter.
+
+
+PRIMA DATĂ (o singură dată, în folder)
+--------------------------------------
+Scrie și apasă Enter:
+
+   npm install
+
+(durează 1-2 minute, apare mult text — e normal; așteaptă)
+
+
+CA S-O PORNEȘTI (de fiecare dată)
+---------------------------------
+Scrie și apasă Enter:
+
+   npm run dev
+
+Apoi deschide în Chrome/Edge:
+
+   http://localhost:5173/
+
+Ca s-o oprești: în terminal apasă  Ctrl + C
+
+
+OPȚIONAL: CA APLICAȚIE CU ICONIȚĂ (offline)
+-------------------------------------------
+   npm run build
+   npm run preview
+
+Deschide adresa afișată, apoi în Chrome/Edge:
+meniul ⋮ (dreapta sus) → "Instalează InstalFinder".
+Va avea iconiță proprie și merge și fără internet.
+
+
+CELE 6 BUTOANE (jos)
+--------------------
+Caută     - cauți/filtrezi/sortezi; "Caută pe net" dacă nu găsești
+Asistent  - spui ce-ți trebuie, primești cele mai potrivite
+Proiect   - ⭐ adaugi; pui cantități; export CSV / PDF / Link
+F5        - lipești/încarci tabelul F5 din licitație; îți caută
+            echipamentul conform; export Cerut vs. Ofertat (CSV/PDF)
+Catalog   - aici pui echipamentele tale (Import CSV sau catalog.json)
+Ghid      - instrucțiuni în aplicație
+Sus dreapta: ☀/☾ schimbă tema (deschis/întunecat)
+
+
+PUNE ECHIPAMENTELE TALE
+-----------------------
+Varianta 1 (simplu): tab "Catalog" → "Model CSV", completezi în
+Excel (tip; producător; model; specificații), încarci înapoi.
+Varianta 2: editezi fișierul  public/catalog.json  cu un editor
+de text, salvezi, reîncarci pagina.
+
+
+PROBLEME FRECVENTE
+------------------
+- "npm nu e recunoscut" → Node.js nu e instalat / repornește laptopul
+- Pagina nu se deschide → ai rulat "npm run dev"? adresa exactă:
+  http://localhost:5173/
+- Oprire → Ctrl + C în terminal; pornire iar → npm run dev
+- Nimeni n-o vede: corect, rulează DOAR pe laptopul tău (nu e online)
