@@ -18,7 +18,7 @@ const safeUrl = (u) =>
   typeof u === 'string' && /^https?:\/\//i.test(u) ? u : '#';
 
 const webSearch = (q) =>
-  `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+  `https://duckduckgo.com/?q=${encodeURIComponent(q)}`;
 
 function buildCatalog(raw) {
   const domains = raw.domains || [];
@@ -544,6 +544,13 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
       .map((c) => ({ c, list: byCat.get(c.key) }));
   }, [results, cat, categories]);
 
+  const searchTerm =
+    q.trim() ||
+    [domain !== 'all' ? domMap[domain]?.label : '', activeCat ? activeCat.label : '']
+      .filter(Boolean)
+      .join(' ') ||
+    'echipamente instalații';
+
   const renderCard = (it) => (
     <EquipmentCard
       key={it.id}
@@ -674,27 +681,14 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
           <p className="text-slate-400 text-sm">
             Niciun echipament nu corespunde criteriilor.
           </p>
-          {(() => {
-            const term =
-              q.trim() ||
-              [
-                domain !== 'all' ? domMap[domain]?.label : '',
-                activeCat ? activeCat.label : '',
-              ]
-                .filter(Boolean)
-                .join(' ') ||
-              'echipamente instalații';
-            return (
-              <a
-                href={webSearch(`${term} fișă tehnică`)}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-sky-700 hover:text-sky-900"
-              >
-                <Globe size={15} /> Caută „{term}" pe net
-              </a>
-            );
-          })()}
+          <a
+            href={webSearch(`${searchTerm} fișă tehnică`)}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-sky-700 hover:text-sky-900"
+          >
+            <Globe size={15} /> Caută „{searchTerm}" pe net
+          </a>
         </div>
       )}
 

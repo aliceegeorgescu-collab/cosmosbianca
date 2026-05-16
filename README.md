@@ -41,7 +41,9 @@ npm install
 npm run dev
 ```
 
-Aplicația se deschide la `http://localhost:5173/`.
+Aplicația se deschide la `http://localhost:5173/` (server de dezvoltare
+restrâns la `127.0.0.1` — privat, doar pe acest dispozitiv). Service
+worker-ul rulează și în `dev`.
 
 ## Privat & instalabil (PWA)
 

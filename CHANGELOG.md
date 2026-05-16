@@ -3,6 +3,17 @@
 Toate modificările notabile ale prototipului. Datele din catalog sunt
 **orientative** (nivel catalog), nu înlocuiesc fișele tehnice oficiale.
 
+## [0.7.1] — 2026-05-16 — Remedieri audit (medii + minore)
+- **esbuild** ridicat la `^0.25.0` prin `overrides` → advisory
+  GHSA-67mh-4wv8-2f99 rezolvat fără upgrade major de Vite.
+- Advisory rămas (Vite path-traversal, **doar dev-server**): NU s-a forțat
+  Vite 8 (breaking). Mitigat prin **dev-server restrâns la `127.0.0.1`**
+  (eliminat `host/allowedHosts/cors` permisive) — uz local privat.
+- **Iconițe PNG** 192/512 (any + maskable) generate, pe lângă SVG.
+- **Service worker activ și în `npm run dev`** (`devOptions.enabled`).
+- „Caută pe net" comutat pe **DuckDuckGo** (mai privat).
+- Refactor: eliminat IIFE-ul din JSX la „zero rezultate".
+
 ## [0.7.0] — 2026-05-16 — PWA privat + „Caută pe net"
 - **PWA instalabilă, offline** (`vite-plugin-pwa`): manifest, service
   worker, `catalog.json` în precache. Rulează doar local — **privată**.
