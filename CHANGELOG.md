@@ -3,6 +3,13 @@
 Toate modificările notabile ale prototipului. Datele din catalog sunt
 **orientative** (nivel catalog), nu înlocuiesc fișele tehnice oficiale.
 
+## [0.7.0] — 2026-05-16 — PWA privat + „Caută pe net"
+- **PWA instalabilă, offline** (`vite-plugin-pwa`): manifest, service
+  worker, `catalog.json` în precache. Rulează doar local — **privată**.
+- Eliminat workflow-ul GitHub Pages (fără publicare automată).
+- **„Caută pe net"**: linkuri de căutare web pre-completate pe card, în
+  fișa detaliată și la zero rezultate, pentru echipamentele lipsă din catalog.
+
 ## [0.6.0] — 2026-05-16 — Tab Ghid + mod dark
 - Tab nou **Ghid**: instrucțiuni de utilizare pentru fiecare secțiune.
 - **Mod dark** comutabil din antet (☀/☾), persistat în `localStorage`,

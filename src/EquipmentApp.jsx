@@ -5,7 +5,7 @@ import {
   Search, Star, SlidersHorizontal, Scale, FolderOpen, Download,
   Copy, X, ExternalLink, Wand2, Trash2, Building2, Check, ArrowDownUp,
   Printer, Link2, Minus, Plus, Database, Upload, RotateCcw,
-  BookOpen, Sun, Moon,
+  BookOpen, Sun, Moon, Globe,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -16,6 +16,9 @@ const useCatalog = () => useContext(CatalogCtx);
 
 const safeUrl = (u) =>
   typeof u === 'string' && /^https?:\/\//i.test(u) ? u : '#';
+
+const webSearch = (q) =>
+  `https://www.google.com/search?q=${encodeURIComponent(q)}`;
 
 function buildCatalog(raw) {
   const domains = raw.domains || [];
@@ -279,6 +282,14 @@ function EquipmentCard({ item, saved, onSave, compared, onCompare, onOpen }) {
           >
             Producător <ExternalLink size={13} />
           </a>
+          <a
+            href={webSearch(`${item.manufacturer} ${item.model} ${cat.label} fișă tehnică`)}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-medium text-slate-500 hover:text-slate-800 inline-flex items-center gap-1"
+          >
+            Caută pe net <Globe size={13} />
+          </a>
           <label className="ml-auto inline-flex items-center gap-1.5 text-sm text-slate-600 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -400,14 +411,24 @@ function DetailModal({ item, saved, onSave, compared, onCompare, onClose }) {
             </button>
           </div>
 
-          <a
-            href={item.url}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-800"
-          >
-            Pagina producătorului <ExternalLink size={13} />
-          </a>
+          <div className="mt-3 flex flex-col gap-1.5">
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-800"
+            >
+              Pagina producătorului <ExternalLink size={13} />
+            </a>
+            <a
+              href={webSearch(`${item.manufacturer} ${item.model} ${cat.label} fișă tehnică`)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-800"
+            >
+              Caută pe net (fișă tehnică) <Globe size={13} />
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -649,9 +670,32 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
       <p className="text-sm text-slate-500 mb-2">{results.length} rezultate</p>
 
       {results.length === 0 && (
-        <p className="text-slate-400 text-sm py-10 text-center">
-          Niciun echipament nu corespunde criteriilor.
-        </p>
+        <div className="py-10 text-center">
+          <p className="text-slate-400 text-sm">
+            Niciun echipament nu corespunde criteriilor.
+          </p>
+          {(() => {
+            const term =
+              q.trim() ||
+              [
+                domain !== 'all' ? domMap[domain]?.label : '',
+                activeCat ? activeCat.label : '',
+              ]
+                .filter(Boolean)
+                .join(' ') ||
+              'echipamente instalații';
+            return (
+              <a
+                href={webSearch(`${term} fișă tehnică`)}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-sky-700 hover:text-sky-900"
+              >
+                <Globe size={15} /> Caută „{term}" pe net
+              </a>
+            );
+          })()}
+        </div>
       )}
 
       {groups
@@ -1241,6 +1285,9 @@ function GuideTab() {
           lista de <strong>sortare</strong> (relevanță, producător, model, sau orice
           parametru ↑↓).</p>
         <p>Apasă un card sau <strong>Detalii</strong> pentru toate specificațiile.</p>
+        <p>Dacă un echipament nu e în catalog, folosește <strong>Caută pe net</strong>
+          (pe card / în detalii / la zero rezultate) — deschide o căutare web
+          pre-completată ca să găsești fișa tehnică oficială.</p>
       </GuideStep>
 
       <GuideStep icon={Wand2} title="Asistent de selecție">
@@ -1268,10 +1315,15 @@ function GuideTab() {
           rebuild. Folosește „Model CSV" ca șablon și „Catalog implicit" pentru revenire.</p>
       </GuideStep>
 
-      <GuideStep icon={Moon} title="Temă & date">
+      <GuideStep icon={Moon} title="Temă, instalare & date">
         <p>Comutatorul ☀/☾ din antet schimbă <strong>tema luminoasă/întunecată</strong>
-          (se reține). Specificațiile sunt <strong>orientative</strong>, la nivel de
-          catalog — nu înlocuiesc fișele tehnice oficiale.</p>
+          (se reține).</p>
+        <p>Aplicația e <strong>instalabilă</strong> (PWA): în Chrome/Edge, din meniul
+          browserului → „Instalează", apare cu iconiță proprie și{' '}
+          <strong>merge offline</strong> (catalogul e ținut în cache). Privată —
+          rulează doar pe dispozitivul tău.</p>
+        <p>Specificațiile sunt <strong>orientative</strong>, la nivel de catalog —
+          nu înlocuiesc fișele tehnice oficiale.</p>
       </GuideStep>
     </div>
   );

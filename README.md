@@ -22,6 +22,8 @@ pagina și apar. Structura: `domains`, `categories` (cu `specs`),
 - 🧭 Filtru pe specialitate → tip echipament (două niveluri)
 - 🔎 Căutare cu filtre interval (min–max), sortare și rezultate grupate;
   fișă detaliată per echipament
+- 🌐 „Caută pe net" — dacă un echipament nu e în catalog, deschide o căutare
+  web pre-completată (pe card / în detalii / la zero rezultate)
 - 🪄 Asistent de selecție — introduci punctul de funcționare, primești cele
   mai apropiate echipamente, ordonate după % de potrivire
 - ⚖️ Comparație side-by-side a echipamentelor selectate
@@ -41,13 +43,22 @@ npm run dev
 
 Aplicația se deschide la `http://localhost:5173/`.
 
-## Build pentru producție
+## Privat & instalabil (PWA)
+
+Aplicația este **privată** — nu este publicată nicăieri (nu există workflow de
+deploy). Rulează doar pe dispozitivul tău.
+
+E o **PWA**: după `npm run build` și servire locală (`npm run preview`), din
+Chrome/Edge → meniu → **Instalează**. Apare cu iconiță proprie și **merge
+offline** (aplicația + `catalog.json` sunt în cache prin service worker).
+Pe `localhost` instalarea funcționează fără HTTPS.
 
 ```bash
 npm run build
+npm run preview   # apoi „Instalează" din browser
 ```
 
-Fișierele rezultate sunt în `dist/`.
+Fișierele rezultate sunt în `dist/` (include `manifest.webmanifest` și `sw.js`).
 
 ## Tehnologii
 
