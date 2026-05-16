@@ -2,17 +2,25 @@
 
 Prototip de aplicație (web, mobile-first) pentru ingineri/proiectanți de
 instalații: caută și compară echipamente de la producători după parametri
-tehnici — pompe, centrale termice, pompe de căldură, chillere,
-ventiloconvectoare, schimbătoare, boilere ACM, vase de expansiune.
+tehnici, organizate pe specialități — **Sanitare, Termice, Electrice, HVAC,
+Incendiu**.
 
-> ⚠️ **Date demonstrative.** Specificațiile din aplicație sunt fictive,
-> doar pentru prototip. Datele reale se preiau din cataloagele oficiale
-> ale producătorilor — a nu se folosi pentru proiectare.
+> ⚠️ **Date orientative.** Specificațiile sunt la nivel de catalog, pentru
+> prototip — nu înlocuiesc fișele tehnice oficiale ale producătorilor.
+> A nu se folosi pentru proiectare fără verificare.
+
+## Date editabile — `public/catalog.json`
+
+Tot catalogul (specialități, tipuri de echipament, producători, echipamente)
+se încarcă la pornire din `public/catalog.json`. Poți **adăuga / modifica /
+înlocui** echipamente direct în acel fișier, fără a atinge codul — reîncarci
+pagina și apar. Structura: `domains`, `categories` (cu `specs`),
+`manufacturers`, `equipment`.
 
 ## Funcționalități
 
+- 🧭 Filtru pe specialitate → tip echipament (două niveluri)
 - 🔎 Căutare după producător/model + filtre numerice pe parametrii cheie
-- 🧭 Categorii multiple (mix general) cu specificații proprii
 - 🪄 Asistent de selecție — introduci punctul de funcționare, primești cele
   mai apropiate echipamente, ordonate după % de potrivire
 - ⚖️ Comparație side-by-side a echipamentelor selectate
