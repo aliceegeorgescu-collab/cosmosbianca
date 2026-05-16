@@ -28,11 +28,13 @@ pagina și apar. Structura: `domains`, `categories` (cu `specs`),
   mai apropiate echipamente, ordonate după % de potrivire
 - ⚖️ Comparație side-by-side a echipamentelor selectate
 - 📋 Proiect cu cantități + totaluri, export CSV / PDF și partajare prin link
+- 📄 Tab „F5" (licitații): lipești/încarci tabelul F5, detectează cerințele,
+  caută în catalog echipamentul conform și exportă tabelul Cerut vs. Ofertat
 - 🗂️ Tab „Catalog": încarci un `catalog.json` propriu sau imporți din CSV
   direct din aplicație (fără rebuild); alegerea se reține local
 - 📖 Tab „Ghid" cu instrucțiuni de utilizare
 - 🌙 Mod dark comutabil din antet (se reține)
-- 📱 Interfață mobile-first, cu navigare jos (Caută / Asistent / Proiect / Catalog / Ghid)
+- 📱 Interfață mobile-first, cu navigare jos (Caută / Asistent / Proiect / F5 / Catalog / Ghid)
 
 ## Rulare locală
 

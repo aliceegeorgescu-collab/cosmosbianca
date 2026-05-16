@@ -5,7 +5,7 @@ import {
   Search, Star, SlidersHorizontal, Scale, FolderOpen, Download,
   Copy, X, ExternalLink, Wand2, Trash2, Building2, Check, ArrowDownUp,
   Printer, Link2, Minus, Plus, Database, Upload, RotateCcw,
-  BookOpen, Sun, Moon, Globe,
+  BookOpen, Sun, Moon, Globe, FileText,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -111,6 +111,33 @@ function parseEquipmentCSV(text) {
       }
     }
     out.push({ category, manufacturer, model, specs });
+  }
+  return out;
+}
+
+const normTxt = (s) =>
+  String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+
+/* F5: dintr-un text lipit (Word/Excel) sau CSV scoate rânduri-cerință:    */
+/* { name, op: 'min'|'max'|'≈', value, um }                                */
+function parseF5(text) {
+  const out = [];
+  const lines = text.replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean);
+  for (const line of lines) {
+    const cells = line.split(/\t|;/).map((c) => c.trim()).filter(Boolean);
+    const joined = cells.length > 1 ? cells.join(' ') : line;
+    const low = joined.toLowerCase();
+    const m = joined.match(/(-?\d+(?:[.,]\d+)?)/);
+    if (!m) continue;
+    let op = '≈';
+    if (/(max|maxim|cel mult|≤|<=|<|\bsub\b|p[âa]n[ăa] la)/.test(low)) op = 'max';
+    else if (/(min|minim|cel pu[țt]in|≥|>=|>|\bpeste\b)/.test(low)) op = 'min';
+    const value = parseFloat(m[1].replace(',', '.'));
+    const after = joined.slice(m.index + m[0].length).trim();
+    const um = (after.match(/^[%°a-zA-ZăâîșțĂÂÎȘȚµ³²·/.\-]+/) || [''])[0].replace(/[.\-]+$/, '');
+    let name = joined.slice(0, m.index).replace(/[:|;–-]+\s*$/, '').trim();
+    if (!name) name = cells[0] || joined.trim();
+    out.push({ name, op, value, um, specKey: '' });
   }
   return out;
 }
@@ -1302,6 +1329,15 @@ function GuideTab() {
           în adresă, se adaugă la deschidere). Lista se salvează local pe dispozitiv.</p>
       </GuideStep>
 
+      <GuideStep icon={FileText} title="F5 (licitații)">
+        <p>Lipești tabelul din fișa <strong>F5</strong> (convertită în Word/Excel)
+          sau încarci un <strong>CSV</strong>. Aplicația detectează cerințele
+          (parametru, ≥/≤, valoare), tu <strong>confirmi maparea</strong> pe
+          specificații, apoi caută în catalog echipamentul <strong>conform</strong>
+          și generează tabelul <strong>Cerut vs. Ofertat</strong> (export CSV/PDF).</p>
+        <p>Semi-automat — verifică valorile la fișa oficială a producătorului.</p>
+      </GuideStep>
+
       <GuideStep icon={Database} title="Catalog (date proprii)">
         <p>Catalogul actual are <strong>{equipment.length} echipamente</strong>. Poți
           încărca un <code>catalog.json</code> propriu sau importa din{' '}
@@ -1324,10 +1360,407 @@ function GuideTab() {
 }
 
 /* ------------------------------------------------------------------ */
+const OP_SYM = { min: '≥', max: '≤', '≈': '≈' };
+
+function F5Tab() {
+  const { categories, catMap, equipment } = useCatalog();
+  const [posName, setPosName] = useState('');
+  const [cat, setCat] = useState(categories[0]?.key || '');
+  const [rawText, setRawText] = useState('');
+  const [reqs, setReqs] = useState([]);
+  const [chosen, setChosen] = useState(null);
+  const [msg, setMsg] = useState(null);
+  const [copied, setCopied] = useState('');
+
+  const numSpecs = useMemo(
+    () => (catMap[cat] ? catMap[cat].specs.filter((s) => s.filter) : []),
+    [catMap, cat],
+  );
+
+  const guessSpec = (name) => {
+    const n = normTxt(name);
+    for (const s of numSpecs) {
+      const l = normTxt(s.label);
+      if (n.includes(l) || (n && l.includes(n.split(' ')[0]))) return s.key;
+    }
+    return '';
+  };
+
+  const analyze = (txt) => {
+    const parsed = parseF5(txt).map((r) => ({ ...r, specKey: guessSpec(r.name) }));
+    setReqs(parsed);
+    setChosen(null);
+    setMsg(
+      parsed.length
+        ? { ok: true, text: `${parsed.length} cerințe detectate. Verifică maparea pe specificație și operatorul.` }
+        : { ok: false, text: 'Nu am găsit rânduri cu valori numerice. Lipește tabelul (parametru + valoare) sau adaugă manual.' },
+    );
+  };
+
+  const importCSV = (file) => {
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => { setRawText(String(r.result)); analyze(String(r.result)); };
+    r.readAsText(file);
+  };
+
+  const setReq = (i, k, v) =>
+    setReqs((rs) => rs.map((r, j) => (j === i ? { ...r, [k]: v } : r)));
+  const delReq = (i) => setReqs((rs) => rs.filter((_, j) => j !== i));
+  const addReq = () =>
+    setReqs((rs) => [...rs, { name: '', op: 'min', value: '', um: '', specKey: '' }]);
+
+  const conf = (r, v) => {
+    const val = parseFloat(r.value);
+    if (!r.specKey || typeof v !== 'number' || isNaN(val)) return null;
+    if (r.op === 'min') return v >= val;
+    if (r.op === 'max') return v <= val;
+    return Math.abs(v - val) <= Math.abs(val) * 0.05 + 1e-9;
+  };
+
+  const mapped = reqs.filter((r) => r.specKey && !isNaN(parseFloat(r.value)));
+
+  const ranked = useMemo(() => {
+    if (mapped.length === 0) return [];
+    return equipment
+      .filter((it) => it.category === cat)
+      .map((it) => {
+        let pass = 0;
+        let fail = 0;
+        for (const r of mapped) {
+          conf(r, it.specs[r.specKey]) === true ? pass++ : fail++;
+        }
+        return { it, pass, fail, ok: fail === 0 };
+      })
+      .sort((a, b) => b.ok - a.ok || b.pass - a.pass || a.fail - b.fail)
+      .slice(0, 12);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [equipment, cat, reqs]);
+
+  const chosenItem = chosen ? equipment.find((it) => it.uid === chosen) : null;
+
+  const rowsFor = (it) =>
+    reqs.map((r, i) => {
+      const sp = catMap[cat]?.specs.find((s) => s.key === r.specKey);
+      const v = it && r.specKey ? it.specs[r.specKey] : undefined;
+      const c = it ? conf(r, v) : null;
+      return {
+        n: i + 1,
+        name: r.name || (sp ? sp.label : '—'),
+        cerut: `${OP_SYM[r.op] || ''} ${r.value} ${r.um || (sp ? sp.unit : '')}`.trim(),
+        um: r.um || (sp ? sp.unit : ''),
+        ofertat: v === undefined ? '—' : fmt(v, sp ? sp.unit : ''),
+        verdict: c === null ? 'verificare manuală' : c ? 'Conform' : 'Neconform',
+      };
+    });
+
+  const toCSV = () => {
+    if (!chosenItem) return '';
+    const head = ['Nr', 'Parametru', 'Cerut', 'U.M.', 'Ofertat', 'Conformitate'];
+    const meta = [
+      ['Poziție F5', posName || catMap[cat]?.label || ''],
+      ['Echipament ofertat', `${chosenItem.manufacturer} ${chosenItem.model}`],
+    ];
+    const data = rowsFor(chosenItem).map((r) => [r.n, r.name, r.cerut, r.um, r.ofertat, r.verdict]);
+    return [...meta, [], head, ...data]
+      .map((row) => row.map((x) => `"${String(x).replace(/"/g, '""')}"`).join(';'))
+      .join('\n');
+  };
+
+  const flash = (k) => { setCopied(k); setTimeout(() => setCopied(''), 1500); };
+
+  const download = () => {
+    const blob = new Blob(['﻿' + toCSV()], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'fisa-F5.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const printF5 = () => {
+    if (!chosenItem) return;
+    const body = rowsFor(chosenItem)
+      .map(
+        (r) =>
+          `<tr><td>${r.n}</td><td>${esc(r.name)}</td><td>${esc(r.cerut)}</td>` +
+          `<td>${esc(r.ofertat)}</td><td>${esc(r.verdict)}</td></tr>`,
+      )
+      .join('');
+    const html =
+      `<!doctype html><html lang="ro"><head><meta charset="utf-8">` +
+      `<title>Fișă tehnică F5</title><style>` +
+      `body{font-family:Arial,Helvetica,sans-serif;margin:24px;color:#0f172a}` +
+      `h1{font-size:17px;margin:0 0 4px}p{font-size:12px;margin:2px 0;color:#334155}` +
+      `table{border-collapse:collapse;width:100%;font-size:12px;margin-top:12px}` +
+      `th,td{border:1px solid #cbd5e1;padding:6px 8px;text-align:left;vertical-align:top}` +
+      `th{background:#f1f5f9}</style></head><body>` +
+      `<h1>Fișă tehnică (F5) — comparativ</h1>` +
+      `<p><b>Poziție:</b> ${esc(posName || catMap[cat]?.label || '')}</p>` +
+      `<p><b>Echipament ofertat:</b> ${esc(chosenItem.manufacturer)} ${esc(chosenItem.model)}</p>` +
+      `<p style="color:#64748b">Date orientative — a se verifica la fișa oficială a producătorului.</p>` +
+      `<table><thead><tr><th>Nr</th><th>Specificație impusă</th><th>Cerut</th>` +
+      `<th>Ofertat</th><th>Conformitate</th></tr></thead><tbody>${body}</tbody></table>` +
+      `<script>window.onload=function(){window.print()}<\/script></body></html>`;
+    const w = window.open('', '_blank');
+    if (!w) { window.alert('Permite ferestrele pop-up pentru a genera PDF-ul.'); return; }
+    w.document.write(html);
+    w.document.close();
+  };
+
+  return (
+    <div className="pb-24">
+      <h2 className="font-bold text-slate-900">F5 — fișă tehnică (licitații)</h2>
+      <p className="text-sm text-slate-500 mt-1">
+        Lipești tabelul din F5 (Word/Excel) sau încarci CSV → confirmi cerințele →
+        aplicația caută în catalog echipamentul conform. Semi-automat: verifică
+        valorile la fișa oficială a producătorului.
+      </p>
+
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <label className="text-sm">
+          <span className="text-slate-500">Denumire poziție (opțional)</span>
+          <input
+            value={posName}
+            onChange={(e) => setPosName(e.target.value)}
+            placeholder="ex. Pompă circulație circuit încălzire"
+            className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300"
+          />
+        </label>
+        <label className="text-sm">
+          <span className="text-slate-500">Tip echipament (în catalog)</span>
+          <select
+            value={cat}
+            onChange={(e) => {
+              setCat(e.target.value);
+              setReqs((rs) => rs.map((r) => ({ ...r, specKey: '' })));
+              setChosen(null);
+            }}
+            className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300"
+          >
+            {categories.map((c) => (
+              <option key={c.key} value={c.key}>{c.label}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <textarea
+        value={rawText}
+        onChange={(e) => setRawText(e.target.value)}
+        rows={5}
+        placeholder={'Lipește aici tabelul din F5 (un rând = o cerință), ex.:\nPutere termică minim 24 kW\nDebit ≥ 9 m³/h\nNivel zgomot max 45 dB'}
+        className="mt-3 w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
+      />
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <Btn onClick={() => analyze(rawText)} primary>
+          <FileText size={16} /> Analizează textul
+        </Btn>
+        <label className="inline-flex items-center justify-center gap-1.5 font-medium py-2.5 rounded-xl text-sm bg-white border border-slate-200 text-slate-700 cursor-pointer">
+          <Upload size={16} /> Încarcă CSV
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(e) => importCSV(e.target.files?.[0])}
+          />
+        </label>
+      </div>
+
+      {msg && (
+        <div
+          className={cls(
+            'mt-3 text-sm rounded-xl p-3 border',
+            msg.ok ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                   : 'bg-rose-50 border-rose-200 text-rose-700',
+          )}
+        >
+          {msg.text}
+        </div>
+      )}
+
+      {reqs.length > 0 && (
+        <>
+          <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+            Cerințe (confirmă maparea)
+          </p>
+          <div className="mt-2 space-y-2">
+            {reqs.map((r, i) => (
+              <div key={i} className="bg-white border border-slate-200 rounded-xl p-3 grid grid-cols-12 gap-2 items-end">
+                <label className="col-span-12 sm:col-span-4 text-xs">
+                  <span className="text-slate-500">Parametru</span>
+                  <input
+                    value={r.name}
+                    onChange={(e) => setReq(i, 'name', e.target.value)}
+                    className="mt-1 w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
+                  />
+                </label>
+                <label className="col-span-5 sm:col-span-3 text-xs">
+                  <span className="text-slate-500">Specificație</span>
+                  <select
+                    value={r.specKey}
+                    onChange={(e) => setReq(i, 'specKey', e.target.value)}
+                    className="mt-1 w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-300"
+                  >
+                    <option value="">(ignoră)</option>
+                    {numSpecs.map((s) => (
+                      <option key={s.key} value={s.key}>{s.label}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="col-span-3 sm:col-span-2 text-xs">
+                  <span className="text-slate-500">Op.</span>
+                  <select
+                    value={r.op}
+                    onChange={(e) => setReq(i, 'op', e.target.value)}
+                    className="mt-1 w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-300"
+                  >
+                    <option value="min">≥ min</option>
+                    <option value="max">≤ max</option>
+                    <option value="≈">≈ egal</option>
+                  </select>
+                </label>
+                <label className="col-span-3 sm:col-span-2 text-xs">
+                  <span className="text-slate-500">Valoare</span>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={r.value}
+                    onChange={(e) => setReq(i, 'value', e.target.value)}
+                    className="mt-1 w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
+                  />
+                </label>
+                <div className="col-span-1 flex justify-end">
+                  <button
+                    onClick={() => delReq(i)}
+                    className="p-2 text-rose-600"
+                    aria-label="Șterge cerința"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button onClick={addReq} className="mt-2 text-sm font-medium text-sky-700">
+            + Adaugă cerință
+          </button>
+        </>
+      )}
+
+      {reqs.length > 0 && (
+        <>
+          <p className="mt-5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+            Echipamente potrivite din catalog
+          </p>
+          {mapped.length === 0 ? (
+            <p className="text-slate-400 text-sm py-4">
+              Mapează cel puțin o cerință pe o specificație și pune o valoare.
+            </p>
+          ) : ranked.length === 0 ? (
+            <p className="text-slate-400 text-sm py-4">
+              Nicio potrivire în catalog pentru acest tip.
+            </p>
+          ) : (
+            <div className="mt-2 space-y-2">
+              {ranked.map(({ it, pass, fail, ok }) => (
+                <div
+                  key={it.id}
+                  className={cls(
+                    'bg-white border rounded-xl p-3 flex items-center justify-between gap-2',
+                    chosen === it.uid ? 'border-sky-500' : 'border-slate-200',
+                  )}
+                >
+                  <div className="min-w-0">
+                    <div className="font-bold text-slate-900 truncate">{it.model}</div>
+                    <div className="text-sm text-slate-500">{it.manufacturer}</div>
+                    <div className="text-xs mt-0.5">
+                      <span className={ok ? 'text-emerald-600 font-semibold' : 'text-amber-600'}>
+                        {ok ? 'Conform' : `${pass}/${pass + fail} cerințe`}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setChosen(it.uid)}
+                    className={cls(
+                      'shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium',
+                      chosen === it.uid ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700',
+                    )}
+                  >
+                    {chosen === it.uid ? 'Ales' : 'Alege'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <a
+            href={webSearch(`${posName || catMap[cat]?.label || ''} fișă tehnică`)}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800"
+          >
+            <Globe size={14} /> Caută pe net (dacă nu e în catalog)
+          </a>
+        </>
+      )}
+
+      {chosenItem && (
+        <>
+          <p className="mt-5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+            F5 — Cerut vs. Ofertat
+          </p>
+          <div className="mt-2 bg-white border border-slate-200 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-slate-50 text-slate-500">
+                    <th className="text-left p-2 font-medium">Specificație</th>
+                    <th className="text-left p-2 font-medium">Cerut</th>
+                    <th className="text-left p-2 font-medium">Ofertat</th>
+                    <th className="text-left p-2 font-medium">Conf.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rowsFor(chosenItem).map((r) => (
+                    <tr key={r.n} className="border-t border-slate-100">
+                      <td className="p-2 text-slate-700">{r.name}</td>
+                      <td className="p-2 text-slate-700">{r.cerut}</td>
+                      <td className="p-2 font-medium text-slate-900">{r.ofertat}</td>
+                      <td
+                        className={cls(
+                          'p-2 font-medium',
+                          r.verdict === 'Conform' ? 'text-emerald-600'
+                            : r.verdict === 'Neconform' ? 'text-rose-600' : 'text-slate-400',
+                        )}
+                      >
+                        {r.verdict}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <Btn onClick={download} primary>
+              <Download size={16} /> Export CSV
+            </Btn>
+            <Btn onClick={printF5}>
+              <Printer size={16} /> PDF / print
+            </Btn>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 const TABS = [
   { key: 'search', label: 'Caută', icon: Search },
   { key: 'assistant', label: 'Asistent', icon: Wand2 },
   { key: 'project', label: 'Proiect', icon: FolderOpen },
+  { key: 'f5', label: 'F5', icon: FileText },
   { key: 'data', label: 'Catalog', icon: Database },
   { key: 'guide', label: 'Ghid', icon: BookOpen },
 ];
@@ -1408,6 +1841,7 @@ function AppShell() {
         )}
         {tab === 'assistant' && <AssistantTab saved={project} onSave={project.toggle} />}
         {tab === 'project' && <ProjectTab project={project} />}
+        {tab === 'f5' && <F5Tab />}
         {tab === 'data' && <DataTab />}
         {tab === 'guide' && <GuideTab />}
       </main>
@@ -1437,7 +1871,7 @@ function AppShell() {
       )}
 
       <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-30">
-        <div className="max-w-3xl mx-auto grid grid-cols-5">
+        <div className="max-w-3xl mx-auto grid grid-cols-6">
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = tab === t.key;

@@ -54,11 +54,13 @@ meniul ⋮ (dreapta sus) → "Instalează InstalFinder".
 Va avea iconiță proprie și merge și fără internet.
 
 
-CELE 5 BUTOANE (jos)
+CELE 6 BUTOANE (jos)
 --------------------
 Caută     - cauți/filtrezi/sortezi; "Caută pe net" dacă nu găsești
 Asistent  - spui ce-ți trebuie, primești cele mai potrivite
 Proiect   - ⭐ adaugi; pui cantități; export CSV / PDF / Link
+F5        - lipești/încarci tabelul F5 din licitație; îți caută
+            echipamentul conform; export Cerut vs. Ofertat (CSV/PDF)
 Catalog   - aici pui echipamentele tale (Import CSV sau catalog.json)
 Ghid      - instrucțiuni în aplicație
 Sus dreapta: ☀/☾ schimbă tema (deschis/întunecat)

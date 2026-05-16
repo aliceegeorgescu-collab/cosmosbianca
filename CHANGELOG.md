@@ -3,6 +3,14 @@
 Toate modificările notabile ale prototipului. Datele din catalog sunt
 **orientative** (nivel catalog), nu înlocuiesc fișele tehnice oficiale.
 
+## [0.8.0] — 2026-05-16 — Tab F5 (licitații)
+- Tab nou **F5**: lipești tabelul din F5 (Word/Excel) sau încarci CSV →
+  detectează automat cerințele (parametru, ≥/≤, valoare, U.M.) → confirmi
+  maparea pe specificații → caută în catalog echipamentul conform →
+  tabel **Cerut vs. Ofertat** cu conform/neconform, export CSV/PDF.
+- Semi-automat; potrivire cu catalogul local + „Caută pe net" la lipsă.
+- Navigare: 6 taburi.
+
 ## [0.7.1] — 2026-05-16 — Remedieri audit (medii + minore)
 - **esbuild** ridicat la `^0.25.0` prin `overrides` → advisory
   GHSA-67mh-4wv8-2f99 rezolvat fără upgrade major de Vite.
