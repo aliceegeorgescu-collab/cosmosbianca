@@ -50,5 +50,4 @@ Fișierele rezultate sunt în `dist/`.
 - Tailwind CSS 3
 - lucide-react (iconițe)
 
-> Versiunea anterioară (Sistemul Solar) rămâne în `src/SolarSystem.jsx`;
-> punctul de intrare (`src/main.jsx`) folosește acum `EquipmentApp.jsx`.
+Punctul de intrare este `src/main.jsx` → `src/EquipmentApp.jsx`.

@@ -10,20 +10,31 @@ import {
 const CatalogCtx = createContext(null);
 const useCatalog = () => useContext(CatalogCtx);
 
+const safeUrl = (u) =>
+  typeof u === 'string' && /^https?:\/\//i.test(u) ? u : '#';
+
 function buildCatalog(raw) {
   const domains = raw.domains || [];
   const categories = raw.categories || [];
   const manufacturers = raw.manufacturers || {};
   const domMap = Object.fromEntries(domains.map((d) => [d.key, d]));
   const catMap = Object.fromEntries(categories.map((c) => [c.key, c]));
+  const equipment = [];
   let id = 0;
-  const equipment = (raw.equipment || [])
-    .filter((e) => catMap[e.category])
-    .map((e) => ({
+  for (const e of raw.equipment || []) {
+    if (!catMap[e.category]) {
+      console.warn(
+        `[catalog] Echipament ignorat — categorie necunoscută "${e.category}" (${e.manufacturer} ${e.model})`,
+      );
+      continue;
+    }
+    equipment.push({
       ...e,
       id: ++id,
-      url: manufacturers[e.manufacturer] || '#',
-    }));
+      uid: `${e.manufacturer}|${e.category}|${e.model}`,
+      url: safeUrl(manufacturers[e.manufacturer]),
+    });
+  }
   return { domains, categories, domMap, catMap, equipment };
 }
 
@@ -90,7 +101,7 @@ function EquipmentCard({ item, saved, onSave, compared, onCompare }) {
             <h3 className="font-bold text-slate-900 leading-tight truncate">{item.model}</h3>
           </div>
           <button
-            onClick={() => onSave(item.id)}
+            onClick={() => onSave(item.uid)}
             aria-label="Salvează în proiect"
             className={cls(
               'shrink-0 p-2 rounded-full transition',
@@ -134,7 +145,7 @@ function EquipmentCard({ item, saved, onSave, compared, onCompare }) {
             <input
               type="checkbox"
               checked={compared}
-              onChange={() => onCompare(item.id)}
+              onChange={() => onCompare(item.uid)}
               className="accent-sky-600 w-4 h-4"
             />
             Compară
@@ -225,7 +236,10 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
   const visibleCats =
     domain === 'all' ? categories : categories.filter((c) => c.domain === domain);
   const activeCat = cat === 'all' ? null : catMap[cat];
-  const numericFilters = activeCat ? activeCat.specs.filter((s) => s.filter) : [];
+  const numericFilters = useMemo(
+    () => (activeCat ? activeCat.specs.filter((s) => s.filter) : []),
+    [activeCat],
+  );
 
   const setF = (k, v) => setFilters((f) => ({ ...f, [k]: v }));
   const resetFilters = () => setFilters({});
@@ -328,9 +342,9 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
           <EquipmentCard
             key={it.id}
             item={it}
-            saved={saved.has(it.id)}
+            saved={saved.has(it.uid)}
             onSave={onSave}
-            compared={compareSet.has(it.id)}
+            compared={compareSet.has(it.uid)}
             onCompare={onCompare}
           />
         ))}
@@ -352,7 +366,7 @@ function AssistantTab({ saved, onSave }) {
   const [cat, setCat] = useState(domCats[0]?.key);
   const [targets, setTargets] = useState({});
   const c = catMap[cat];
-  const numeric = c ? c.specs.filter((s) => s.filter) : [];
+  const numeric = useMemo(() => (c ? c.specs.filter((s) => s.filter) : []), [c]);
 
   const changeDomain = (d) => {
     setDomain(d);
@@ -474,14 +488,14 @@ function AssistantTab({ saved, onSave }) {
               ))}
             </div>
             <button
-              onClick={() => onSave(it.id)}
+              onClick={() => onSave(it.uid)}
               className={cls(
                 'mt-2 text-sm font-medium inline-flex items-center gap-1',
-                saved.has(it.id) ? 'text-amber-600' : 'text-sky-700 hover:text-sky-900',
+                saved.has(it.uid) ? 'text-amber-600' : 'text-sky-700 hover:text-sky-900',
               )}
             >
-              <Star size={15} fill={saved.has(it.id) ? 'currentColor' : 'none'} />
-              {saved.has(it.id) ? 'În proiect' : 'Adaugă în proiect'}
+              <Star size={15} fill={saved.has(it.uid) ? 'currentColor' : 'none'} />
+              {saved.has(it.uid) ? 'În proiect' : 'Adaugă în proiect'}
             </button>
           </div>
         ))}
@@ -494,7 +508,7 @@ function AssistantTab({ saved, onSave }) {
 function ProjectTab({ saved, onSave, setSaved }) {
   const { domains, catMap, domMap, equipment } = useCatalog();
   const [copied, setCopied] = useState(false);
-  const items = equipment.filter((it) => saved.has(it.id));
+  const items = equipment.filter((it) => saved.has(it.uid));
 
   const toCSV = () => {
     const head = ['Specialitate', 'Categorie', 'Producator', 'Model', 'Specificatii'];
@@ -587,7 +601,7 @@ function ProjectTab({ saved, onSave, setSaved }) {
                         <div className="text-sm text-slate-500">{it.manufacturer}</div>
                       </div>
                       <button
-                        onClick={() => onSave(it.id)}
+                        onClick={() => onSave(it.uid)}
                         className="p-2 text-amber-500"
                         aria-label="Scoate din proiect"
                       >
@@ -618,9 +632,23 @@ function AppShell() {
   const [saved, toggleSaved, setSaved] = useLocalSet('instalfinder.saved');
   const [compareSet, toggleCompare, setCompareSet] = useLocalSet('instalfinder.compare');
   const [showCompare, setShowCompare] = useState(false);
-  const [showBanner, setShowBanner] = useState(true);
+  const [showBanner, setShowBanner] = useState(() => {
+    try {
+      return localStorage.getItem('instalfinder.banner') !== '0';
+    } catch {
+      return true;
+    }
+  });
+  const closeBanner = () => {
+    setShowBanner(false);
+    try {
+      localStorage.setItem('instalfinder.banner', '0');
+    } catch {
+      /* ignore */
+    }
+  };
 
-  const compareItems = equipment.filter((it) => compareSet.has(it.id));
+  const compareItems = equipment.filter((it) => compareSet.has(it.uid));
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -642,7 +670,7 @@ function AppShell() {
               înlocuiesc fișele tehnice oficiale; verifică la producător înainte de proiectare.
             </span>
             <button
-              onClick={() => setShowBanner(false)}
+              onClick={closeBanner}
               className="ml-auto shrink-0 p-1 hover:text-amber-950"
               aria-label="Închide"
             >
