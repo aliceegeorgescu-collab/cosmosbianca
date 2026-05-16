@@ -3,6 +3,15 @@
 Toate modificările notabile ale prototipului. Datele din catalog sunt
 **orientative** (nivel catalog), nu înlocuiesc fișele tehnice oficiale.
 
+## [0.5.1] — 2026-05-16 — Remedieri audit (toate)
+- Dedupe la nivel de `uid` în `buildCatalog` (ultimul câștigă) + warn;
+  intrările `equipment` fără câmpuri obligatorii sunt ignorate cu warn.
+- `Btn` mutat la nivel de modul (fără remontare la fiecare render).
+- Badge-ul tab-ului Proiect numără doar pozițiile rezolvabile în catalogul curent.
+- `escape/unescape` înlocuite cu base64 UTF-8 (TextEncoder/TextDecoder).
+- `AssistantTab`: select-uri protejate pentru domeniu fără categorii.
+- Filtru interval: indiciu vizual când min > max.
+
 ## [0.5.0] — 2026-05-16 — Date: catalog mare + import în aplicație
 - Catalog extins la ~98 modele / 38 producători, pe toate cele 5 specialități.
 - Tab nou **Catalog**: încărcare `catalog.json` propriu sau import echipamente
@@ -43,8 +52,6 @@ Toate modificările notabile ale prototipului. Datele din catalog sunt
   comparație, listă de proiect (localStorage), export CSV.
 - _Commit:_ `fe73140`
 
-## Audit deschis (de remediat)
-- Mediu: dedupe la import CSV; `Btn` scos din `ProjectTab`; badge proiect
-  să numere doar pozițiile rezolvabile la catalog diferit.
-- Minor: guard pe intrările `equipment`; edge domeniu fără categorii;
-  înlocuire `escape/unescape`; indiciu vizual când min > max.
+## Audit
+- Rulat 2026-05-16: fără probleme critice. Toate punctele medii și
+  minore au fost remediate în `[0.5.1]`. Niciun element deschis.

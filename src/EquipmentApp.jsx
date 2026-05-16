@@ -23,20 +23,32 @@ function buildCatalog(raw) {
   const domMap = Object.fromEntries(domains.map((d) => [d.key, d]));
   const catMap = Object.fromEntries(categories.map((c) => [c.key, c]));
   const equipment = [];
+  const seen = new Map();
   let id = 0;
   for (const e of raw.equipment || []) {
+    if (!e || !e.category || !e.manufacturer || !e.model ||
+        typeof e.specs !== 'object' || e.specs === null) {
+      console.warn('[catalog] Intrare ignorată — câmpuri lipsă (category/manufacturer/model/specs):', e);
+      continue;
+    }
     if (!catMap[e.category]) {
       console.warn(
         `[catalog] Echipament ignorat — categorie necunoscută "${e.category}" (${e.manufacturer} ${e.model})`,
       );
       continue;
     }
-    equipment.push({
-      ...e,
-      id: ++id,
-      uid: `${e.manufacturer}|${e.category}|${e.model}`,
-      url: safeUrl(manufacturers[e.manufacturer]),
-    });
+    const uid = `${e.manufacturer}|${e.category}|${e.model}`;
+    const entry = { ...e, uid, url: safeUrl(manufacturers[e.manufacturer]) };
+    if (seen.has(uid)) {
+      const idx = seen.get(uid);
+      entry.id = equipment[idx].id;
+      equipment[idx] = entry;
+      console.warn(`[catalog] Duplicat înlocuit (ultimul câștigă): ${uid}`);
+    } else {
+      entry.id = ++id;
+      seen.set(uid, equipment.length);
+      equipment.push(entry);
+    }
   }
   return { domains, categories, domMap, catMap, equipment };
 }
@@ -45,10 +57,18 @@ const fmt = (v, unit) => (unit ? `${v} ${unit}` : `${v}`);
 const cls = (...a) => a.filter(Boolean).join(' ');
 const esc = (s) =>
   String(s).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
-const encodeProject = (obj) =>
-  encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(obj)))));
-const decodeProject = (s) =>
-  JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(s)))));
+const b64encode = (str) => {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  bytes.forEach((b) => { bin += String.fromCharCode(b); });
+  return btoa(bin);
+};
+const b64decode = (b64) => {
+  const bin = atob(b64);
+  return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+};
+const encodeProject = (obj) => encodeURIComponent(b64encode(JSON.stringify(obj)));
+const decodeProject = (s) => JSON.parse(b64decode(decodeURIComponent(s)));
 
 /* CSV: prima linie antet cu coloanele category;manufacturer;model;specs    */
 /* specs = "cheie:valoare|cheie:valoare" (valorile numerice sunt detectate) */
@@ -162,7 +182,7 @@ function useProject() {
   const setOne = (uid, v) =>
     setQty((p) => ({ ...p, [uid]: Math.max(1, Math.floor(Number(v) || 1)) }));
   const clear = () => setQty({});
-  return { qty, has, count: Object.keys(qty).length, toggle, setOne, clear };
+  return { qty, has, toggle, setOne, clear };
 }
 
 /* ------------------------------------------------------------------ */
@@ -558,6 +578,9 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
           <div className="mt-2 grid grid-cols-1 gap-2 bg-white p-3 rounded-xl border border-slate-200">
             {numericFilters.map((s) => {
               const f = filters[s.key] || {};
+              const mn = parseFloat(f.min);
+              const mx = parseFloat(f.max);
+              const bad = !isNaN(mn) && !isNaN(mx) && mn > mx;
               return (
                 <div key={s.key} className="text-sm">
                   <span className="text-slate-500">
@@ -579,9 +602,15 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
                       placeholder="max"
                       value={f.max ?? ''}
                       onChange={(e) => setBound(s.key, 'max', e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                      className={cls(
+                        'w-full px-2 py-1.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-sky-300',
+                        bad ? 'border-rose-300' : 'border-slate-200',
+                      )}
                     />
                   </div>
+                  {bad && (
+                    <p className="mt-1 text-xs text-rose-600">min &gt; max — niciun rezultat</p>
+                  )}
                 </div>
               );
             })}
@@ -684,7 +713,7 @@ function AssistantTab({ saved, onSave }) {
         <label className="block mt-4 text-sm">
           <span className="text-slate-500">Specialitate</span>
           <select
-            value={domain}
+            value={domain || ''}
             onChange={(e) => changeDomain(e.target.value)}
             className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300"
           >
@@ -697,10 +726,12 @@ function AssistantTab({ saved, onSave }) {
         <label className="block mt-3 text-sm">
           <span className="text-slate-500">Tip echipament</span>
           <select
-            value={cat}
+            value={cat || ''}
             onChange={(e) => { setCat(e.target.value); setTargets({}); }}
-            className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300"
+            disabled={domCats.length === 0}
+            className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300 disabled:bg-slate-50"
           >
+            {domCats.length === 0 && <option value="">— fără categorii —</option>}
             {domCats.map((x) => (
               <option key={x.key} value={x.key}>{x.label}</option>
             ))}
@@ -779,6 +810,20 @@ function AssistantTab({ saved, onSave }) {
 }
 
 /* ------------------------------------------------------------------ */
+function Btn({ onClick, children, primary }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cls(
+        'inline-flex items-center justify-center gap-1.5 font-medium py-2.5 rounded-xl text-sm',
+        primary ? 'bg-sky-600 text-white' : 'bg-white border border-slate-200 text-slate-700',
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
 function ProjectTab({ project }) {
   const { domains, catMap, domMap, equipment } = useCatalog();
   const [copied, setCopied] = useState('');
@@ -879,18 +924,6 @@ function ProjectTab({ project }) {
   const grouped = domains
     .map((d) => ({ d, list: items.filter((it) => catMap[it.category].domain === d.key) }))
     .filter((g) => g.list.length > 0);
-
-  const Btn = ({ onClick, children, primary }) => (
-    <button
-      onClick={onClick}
-      className={cls(
-        'inline-flex items-center justify-center gap-1.5 font-medium py-2.5 rounded-xl text-sm',
-        primary ? 'bg-sky-600 text-white' : 'bg-white border border-slate-200 text-slate-700',
-      )}
-    >
-      {children}
-    </button>
-  );
 
   return (
     <div className="pb-24">
@@ -1185,6 +1218,7 @@ function AppShell() {
   };
 
   const compareItems = equipment.filter((it) => compareSet.has(it.uid));
+  const projectCount = equipment.filter((it) => project.has(it.uid)).length;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -1270,9 +1304,9 @@ function AppShell() {
               >
                 <Icon size={20} />
                 {t.label}
-                {t.key === 'project' && project.count > 0 && (
+                {t.key === 'project' && projectCount > 0 && (
                   <span className="absolute top-1 right-1/2 translate-x-5 bg-amber-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                    {project.count}
+                    {projectCount}
                   </span>
                 )}
               </button>
