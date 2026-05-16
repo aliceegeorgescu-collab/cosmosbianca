@@ -118,8 +118,12 @@ function parseEquipmentCSV(text) {
 const normTxt = (s) =>
   String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 
+let f5seq = 0;
+const f5id = () => ++f5seq;
+
 /* F5: dintr-un text lipit (Word/Excel) sau CSV scoate rânduri-cerință:    */
-/* { name, op: 'min'|'max'|'≈', value, um }                                */
+/* { _id, name, op: 'min'|'max'|'≈', value, um }. Implicit: 'min' (cele    */
+/* mai multe specificații impuse în licitații sunt valori minime).         */
 function parseF5(text) {
   const out = [];
   const lines = text.replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean);
@@ -129,15 +133,16 @@ function parseF5(text) {
     const low = joined.toLowerCase();
     const m = joined.match(/(-?\d+(?:[.,]\d+)?)/);
     if (!m) continue;
-    let op = '≈';
+    let op = 'min';
     if (/(max|maxim|cel mult|≤|<=|<|\bsub\b|p[âa]n[ăa] la)/.test(low)) op = 'max';
     else if (/(min|minim|cel pu[țt]in|≥|>=|>|\bpeste\b)/.test(low)) op = 'min';
+    else if (/(\begal\b|exact|=)/.test(low)) op = '≈';
     const value = parseFloat(m[1].replace(',', '.'));
     const after = joined.slice(m.index + m[0].length).trim();
     const um = (after.match(/^[%°a-zA-ZăâîșțĂÂÎȘȚµ³²·/.\-]+/) || [''])[0].replace(/[.\-]+$/, '');
     let name = joined.slice(0, m.index).replace(/[:|;–-]+\s*$/, '').trim();
     if (!name) name = cells[0] || joined.trim();
-    out.push({ name, op, value, um, specKey: '' });
+    out.push({ _id: f5id(), name, op, value, um, specKey: '' });
   }
   return out;
 }
@@ -1372,6 +1377,35 @@ function F5Tab() {
   const [msg, setMsg] = useState(null);
   const [copied, setCopied] = useState('');
 
+  useEffect(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('instalfinder.f5') || 'null');
+      if (s && typeof s === 'object') {
+        if (typeof s.posName === 'string') setPosName(s.posName);
+        if (s.cat && catMap[s.cat]) setCat(s.cat);
+        if (typeof s.rawText === 'string') setRawText(s.rawText);
+        if (Array.isArray(s.reqs)) {
+          setReqs(s.reqs.map((r) => ({ ...r, _id: r._id ?? f5id() })));
+        }
+        if (typeof s.chosen === 'string') setChosen(s.chosen);
+      }
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        'instalfinder.f5',
+        JSON.stringify({ posName, cat, rawText, reqs, chosen }),
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [posName, cat, rawText, reqs, chosen]);
+
   const numSpecs = useMemo(
     () => (catMap[cat] ? catMap[cat].specs.filter((s) => s.filter) : []),
     [catMap, cat],
@@ -1408,7 +1442,7 @@ function F5Tab() {
     setReqs((rs) => rs.map((r, j) => (j === i ? { ...r, [k]: v } : r)));
   const delReq = (i) => setReqs((rs) => rs.filter((_, j) => j !== i));
   const addReq = () =>
-    setReqs((rs) => [...rs, { name: '', op: 'min', value: '', um: '', specKey: '' }]);
+    setReqs((rs) => [...rs, { _id: f5id(), name: '', op: 'min', value: '', um: '', specKey: '' }]);
 
   const conf = (r, v) => {
     const val = parseFloat(r.value);
@@ -1586,7 +1620,7 @@ function F5Tab() {
           </p>
           <div className="mt-2 space-y-2">
             {reqs.map((r, i) => (
-              <div key={i} className="bg-white border border-slate-200 rounded-xl p-3 grid grid-cols-12 gap-2 items-end">
+              <div key={r._id ?? i} className="bg-white border border-slate-200 rounded-xl p-3 grid grid-cols-12 gap-2 items-end">
                 <label className="col-span-12 sm:col-span-4 text-xs">
                   <span className="text-slate-500">Parametru</span>
                   <input
@@ -1880,7 +1914,7 @@ function AppShell() {
                 key={t.key}
                 onClick={() => setTab(t.key)}
                 className={cls(
-                  'relative py-2.5 flex flex-col items-center gap-0.5 text-xs font-medium',
+                  'relative py-2.5 flex flex-col items-center gap-0.5 text-[10px] font-medium whitespace-nowrap',
                   active ? 'text-sky-700' : 'text-slate-400',
                 )}
               >

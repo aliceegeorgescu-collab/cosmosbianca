@@ -3,6 +3,14 @@
 Toate modificările notabile ale prototipului. Datele din catalog sunt
 **orientative** (nivel catalog), nu înlocuiesc fișele tehnice oficiale.
 
+## [0.8.1] — 2026-05-16 — Remedieri audit F5
+- Starea din F5 (poziție, tip, text, cerințe, ales) **persistă** în
+  `localStorage` — nu se mai pierde la schimbarea tabului.
+- Operator implicit la detecție = **`min`** (specificațiile impuse sunt
+  de regulă valori minime); `≈` doar la „egal/exact".
+- Rândurile de cerințe au **id stabil** (fără artefacte la ștergere).
+- Polish: bara de jos cu 6 taburi — text mai compact, fără wrap.
+
 ## [0.8.0] — 2026-05-16 — Tab F5 (licitații)
 - Tab nou **F5**: lipești tabelul din F5 (Word/Excel) sau încarci CSV →
   detectează automat cerințele (parametru, ≥/≤, valoare, U.M.) → confirmi
