@@ -1,22 +1,23 @@
-# 🌌 Sistemul Solar Interactiv
+# InstalFinder — Căutare echipamente instalații
 
-Aplicație educativă în română pentru copii — descoperă universul nostru cu planete realiste, gaură neagră, galaxii, zodii, jocuri și narațiune cu voce.
+Prototip de aplicație (web, mobile-first) pentru ingineri/proiectanți de
+instalații: caută și compară echipamente de la producători după parametri
+tehnici — pompe, centrale termice, pompe de căldură, chillere,
+ventiloconvectoare, schimbătoare, boilere ACM, vase de expansiune.
+
+> ⚠️ **Date demonstrative.** Specificațiile din aplicație sunt fictive,
+> doar pentru prototip. Datele reale se preiau din cataloagele oficiale
+> ale producătorilor — a nu se folosi pentru proiectare.
 
 ## Funcționalități
 
-- 🪐 9 planete (cu Pluto) + Soarele, fiecare cu suprafața detaliată, descriere, fapte amuzante și 3 glume
-- 🌙 Luni proprii pentru fiecare planetă (Luna, Io, Europa, Titan, etc.)
-- ☄️ Centură de asteroizi între Marte și Jupiter, Cometa Halley pe orbita ei
-- 🛰️ Stația Spațială Internațională orbitând Pământul, sondele Voyager 1 & 2 în spațiul interstelar
-- 🕳️ Gaură neagră realistă (stil Interstellar) cu disc de acreție și inel de fotoni
-- 🌌 3 galaxii spirale (Calea Lactee, Andromeda, Galaxia Roată) cu brațe procedurale
-- ⭐ 12 constelații zodiacale clickabile (Berbec, Taur, ..., Pești)
-- 🐍🐧🚀 Personaje (Sis Șarpele, Pip Pinguinul, Racheta) cu glume
-- 🎬 Tur ghidat audio · 🎶 Muzică ambientală · 🎯 Quiz · 🎨 Mod desenează planeta ta
-- 🃏 Memory Match · 📏 Sortează planetele · 📅 Provocare zilnică · 🎴 Galerie stickere · 🎙️ Mod poveste
-- 🌗 Zi/noapte pe Pământ · 🌌 Aurora boreală · 🛸 OZN-uri ocazionale · ⭐ Stele cu dorință
-- 🎂 Calculator vârstă pe planete · 💾 Salvare progres · 🔗 Share link
-- 🎙️ Voce românească (Web Speech / Google Translate TTS)
+- 🔎 Căutare după producător/model + filtre numerice pe parametrii cheie
+- 🧭 Categorii multiple (mix general) cu specificații proprii
+- 🪄 Asistent de selecție — introduci punctul de funcționare, primești cele
+  mai apropiate echipamente, ordonate după % de potrivire
+- ⚖️ Comparație side-by-side a echipamentelor selectate
+- ⭐ Listă de proiect salvată local (localStorage), cu export CSV / copiere
+- 📱 Interfață mobile-first, cu navigare jos (Caută / Asistent / Proiect)
 
 ## Rulare locală
 
@@ -39,6 +40,7 @@ Fișierele rezultate sunt în `dist/`.
 
 - React 18 + Vite 5
 - Tailwind CSS 3
-- Web Audio API (pentru muzică ambientală + clinchete)
-- Web Speech API + Google Translate TTS (pentru narațiune)
-- SVG inline (pentru toate vizualele realiste)
+- lucide-react (iconițe)
+
+> Versiunea anterioară (Sistemul Solar) rămâne în `src/SolarSystem.jsx`;
+> punctul de intrare (`src/main.jsx`) folosește acum `EquipmentApp.jsx`.
