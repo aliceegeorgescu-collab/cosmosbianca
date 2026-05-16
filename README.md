@@ -20,12 +20,15 @@ pagina și apar. Structura: `domains`, `categories` (cu `specs`),
 ## Funcționalități
 
 - 🧭 Filtru pe specialitate → tip echipament (două niveluri)
-- 🔎 Căutare după producător/model + filtre numerice pe parametrii cheie
+- 🔎 Căutare cu filtre interval (min–max), sortare și rezultate grupate;
+  fișă detaliată per echipament
 - 🪄 Asistent de selecție — introduci punctul de funcționare, primești cele
   mai apropiate echipamente, ordonate după % de potrivire
 - ⚖️ Comparație side-by-side a echipamentelor selectate
-- ⭐ Listă de proiect salvată local (localStorage), cu export CSV / copiere
-- 📱 Interfață mobile-first, cu navigare jos (Caută / Asistent / Proiect)
+- 📋 Proiect cu cantități + totaluri, export CSV / PDF și partajare prin link
+- 🗂️ Tab „Catalog": încarci un `catalog.json` propriu sau imporți din CSV
+  direct din aplicație (fără rebuild); alegerea se reține local
+- 📱 Interfață mobile-first, cu navigare jos (Caută / Asistent / Proiect / Catalog)
 
 ## Rulare locală
 
