@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useContext, createContext } from '
 import {
   Search, Star, SlidersHorizontal, Scale, FolderOpen, Download,
   Copy, X, ExternalLink, Wand2, Trash2, Building2, Check, ArrowDownUp,
+  Printer, Link2, Minus, Plus,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -40,6 +41,12 @@ function buildCatalog(raw) {
 
 const fmt = (v, unit) => (unit ? `${v} ${unit}` : `${v}`);
 const cls = (...a) => a.filter(Boolean).join(' ');
+const esc = (s) =>
+  String(s).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+const encodeProject = (obj) =>
+  encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(obj)))));
+const decodeProject = (s) =>
+  JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(s)))));
 
 function useLocalSet(key) {
   const [set, setSet] = useState(() => {
@@ -64,6 +71,55 @@ function useLocalSet(key) {
       return n;
     });
   return [set, toggle, setSet];
+}
+
+function useProject() {
+  const [qty, setQty] = useState(() => {
+    try {
+      const raw = localStorage.getItem('instalfinder.project');
+      if (raw) return JSON.parse(raw) || {};
+      const old = localStorage.getItem('instalfinder.saved');
+      if (old) return Object.fromEntries((JSON.parse(old) || []).map((u) => [u, 1]));
+    } catch {
+      /* ignore */
+    }
+    return {};
+  });
+
+  useEffect(() => {
+    const m = window.location.hash.match(/[#&]p=([^&]+)/);
+    if (!m) return;
+    try {
+      const incoming = decodeProject(m[1]);
+      if (incoming && typeof incoming === 'object') {
+        setQty((p) => ({ ...p, ...incoming }));
+      }
+    } catch {
+      /* ignore */
+    }
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('instalfinder.project', JSON.stringify(qty));
+    } catch {
+      /* ignore */
+    }
+  }, [qty]);
+
+  const has = (uid) => Object.prototype.hasOwnProperty.call(qty, uid);
+  const toggle = (uid) =>
+    setQty((p) => {
+      const n = { ...p };
+      if (n[uid]) delete n[uid];
+      else n[uid] = 1;
+      return n;
+    });
+  const setOne = (uid, v) =>
+    setQty((p) => ({ ...p, [uid]: Math.max(1, Math.floor(Number(v) || 1)) }));
+  const clear = () => setQty({});
+  return { qty, has, count: Object.keys(qty).length, toggle, setOne, clear };
 }
 
 /* ------------------------------------------------------------------ */
@@ -680,24 +736,40 @@ function AssistantTab({ saved, onSave }) {
 }
 
 /* ------------------------------------------------------------------ */
-function ProjectTab({ saved, onSave, setSaved }) {
+function ProjectTab({ project }) {
   const { domains, catMap, domMap, equipment } = useCatalog();
-  const [copied, setCopied] = useState(false);
-  const items = equipment.filter((it) => saved.has(it.uid));
+  const [copied, setCopied] = useState('');
+  const items = equipment.filter((it) => project.has(it.uid));
+  const totalPieces = items.reduce((s, it) => s + (project.qty[it.uid] || 1), 0);
 
-  const toCSV = () => {
-    const head = ['Specialitate', 'Categorie', 'Producator', 'Model', 'Specificatii'];
-    const rows = items.map((it) => {
+  const rows = () =>
+    items.map((it) => {
       const c = catMap[it.category];
       const specs = c.specs
         .filter((s) => it.specs[s.key] !== undefined)
         .map((s) => `${s.label}: ${fmt(it.specs[s.key], s.unit)}`)
         .join(' | ');
-      return [domMap[c.domain]?.label, c.label, it.manufacturer, it.model, specs];
+      return {
+        dom: domMap[c.domain]?.label || '',
+        cat: c.label,
+        mfg: it.manufacturer,
+        model: it.model,
+        qty: project.qty[it.uid] || 1,
+        specs,
+      };
     });
-    return [head, ...rows]
+
+  const toCSV = () => {
+    const head = ['Specialitate', 'Categorie', 'Producator', 'Model', 'Cantitate', 'Specificatii'];
+    const data = rows().map((r) => [r.dom, r.cat, r.mfg, r.model, r.qty, r.specs]);
+    return [head, ...data]
       .map((r) => r.map((x) => `"${String(x).replace(/"/g, '""')}"`).join(';'))
       .join('\n');
+  };
+
+  const flash = (k) => {
+    setCopied(k);
+    setTimeout(() => setCopied(''), 1500);
   };
 
   const download = () => {
@@ -709,27 +781,83 @@ function ProjectTab({ saved, onSave, setSaved }) {
     URL.revokeObjectURL(a.href);
   };
 
-  const copy = async () => {
+  const copyCSV = async () => {
     try {
       await navigator.clipboard.writeText(toCSV());
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      flash('csv');
     } catch {
       /* ignore */
     }
+  };
+
+  const shareLink = async () => {
+    const link = `${window.location.origin}${window.location.pathname}#p=${encodeProject(project.qty)}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      flash('link');
+    } catch {
+      window.prompt('Copiază linkul proiectului:', link);
+    }
+  };
+
+  const printPDF = () => {
+    const r = rows();
+    const body = r
+      .map(
+        (x, i) =>
+          `<tr><td>${i + 1}</td><td>${esc(x.dom)}</td><td>${esc(x.cat)}</td><td>${esc(
+            x.mfg,
+          )}</td><td>${esc(x.model)}</td><td class="r">${x.qty}</td><td>${esc(x.specs)}</td></tr>`,
+      )
+      .join('');
+    const html =
+      `<!doctype html><html lang="ro"><head><meta charset="utf-8">` +
+      `<title>Listă echipamente — InstalFinder</title><style>` +
+      `body{font-family:Arial,Helvetica,sans-serif;margin:24px;color:#0f172a}` +
+      `h1{font-size:18px;margin:0 0 4px}p{font-size:11px;color:#64748b;margin:0}` +
+      `table{border-collapse:collapse;width:100%;font-size:12px;margin-top:14px}` +
+      `th,td{border:1px solid #cbd5e1;padding:6px 8px;text-align:left;vertical-align:top}` +
+      `th{background:#f1f5f9}.r{text-align:right}</style></head><body>` +
+      `<h1>Listă echipamente — InstalFinder</h1>` +
+      `<p>Date orientative — verifică la producător. ${r.length} poziții, ${totalPieces} buc.</p>` +
+      `<table><thead><tr><th>#</th><th>Specialitate</th><th>Categorie</th>` +
+      `<th>Producător</th><th>Model</th><th class="r">Cant.</th><th>Specificații</th></tr></thead>` +
+      `<tbody>${body}</tbody></table>` +
+      `<script>window.onload=function(){window.print()}<\/script></body></html>`;
+    const w = window.open('', '_blank');
+    if (!w) {
+      window.alert('Permite ferestrele pop-up pentru a genera PDF-ul.');
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
   };
 
   const grouped = domains
     .map((d) => ({ d, list: items.filter((it) => catMap[it.category].domain === d.key) }))
     .filter((g) => g.list.length > 0);
 
+  const Btn = ({ onClick, children, primary }) => (
+    <button
+      onClick={onClick}
+      className={cls(
+        'inline-flex items-center justify-center gap-1.5 font-medium py-2.5 rounded-xl text-sm',
+        primary ? 'bg-sky-600 text-white' : 'bg-white border border-slate-200 text-slate-700',
+      )}
+    >
+      {children}
+    </button>
+  );
+
   return (
     <div className="pb-24">
       <div className="flex items-center justify-between">
-        <h2 className="font-bold text-slate-900">Lista proiectului ({items.length})</h2>
+        <h2 className="font-bold text-slate-900">
+          Lista proiectului ({items.length} poz · {totalPieces} buc)
+        </h2>
         {items.length > 0 && (
           <button
-            onClick={() => setSaved(new Set())}
+            onClick={project.clear}
             className="text-sm text-rose-600 inline-flex items-center gap-1"
           >
             <Trash2 size={15} /> Golește
@@ -743,20 +871,21 @@ function ProjectTab({ saved, onSave, setSaved }) {
         </p>
       ) : (
         <>
-          <div className="mt-3 flex gap-2">
-            <button
-              onClick={download}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 bg-sky-600 text-white font-medium py-2.5 rounded-xl"
-            >
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Btn onClick={download} primary>
               <Download size={16} /> Export CSV
-            </button>
-            <button
-              onClick={copy}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 bg-white border border-slate-200 text-slate-700 font-medium py-2.5 rounded-xl"
-            >
-              {copied ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
-              {copied ? 'Copiat' : 'Copiază'}
-            </button>
+            </Btn>
+            <Btn onClick={copyCSV}>
+              {copied === 'csv' ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+              {copied === 'csv' ? 'Copiat' : 'Copiază CSV'}
+            </Btn>
+            <Btn onClick={printPDF}>
+              <Printer size={16} /> PDF
+            </Btn>
+            <Btn onClick={shareLink}>
+              {copied === 'link' ? <Check size={16} className="text-emerald-600" /> : <Link2 size={16} />}
+              {copied === 'link' ? 'Link copiat' : 'Link'}
+            </Btn>
           </div>
 
           {grouped.map(({ d, list }) => (
@@ -765,26 +894,55 @@ function ProjectTab({ saved, onSave, setSaved }) {
                 {d.label} ({list.length})
               </p>
               <div className="space-y-3">
-                {list.map((it) => (
-                  <div key={it.id} className="bg-white rounded-2xl border border-slate-200 p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">
-                          {catMap[it.category].label}
-                        </span>
-                        <div className="font-bold text-slate-900">{it.model}</div>
-                        <div className="text-sm text-slate-500">{it.manufacturer}</div>
+                {list.map((it) => {
+                  const n = project.qty[it.uid] || 1;
+                  return (
+                    <div key={it.id} className="bg-white rounded-2xl border border-slate-200 p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">
+                            {catMap[it.category].label}
+                          </span>
+                          <div className="font-bold text-slate-900">{it.model}</div>
+                          <div className="text-sm text-slate-500">{it.manufacturer}</div>
+                        </div>
+                        <button
+                          onClick={() => project.toggle(it.uid)}
+                          className="p-2 text-amber-500"
+                          aria-label="Scoate din proiect"
+                        >
+                          <Star size={18} fill="currentColor" />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => onSave(it.uid)}
-                        className="p-2 text-amber-500"
-                        aria-label="Scoate din proiect"
-                      >
-                        <Star size={18} fill="currentColor" />
-                      </button>
+                      <div className="mt-3 flex items-center gap-2">
+                        <span className="text-sm text-slate-500">Cantitate</span>
+                        <div className="ml-auto inline-flex items-center gap-1">
+                          <button
+                            onClick={() => project.setOne(it.uid, n - 1)}
+                            className="w-8 h-8 rounded-lg border border-slate-200 text-slate-700 inline-flex items-center justify-center"
+                            aria-label="Scade cantitatea"
+                          >
+                            <Minus size={15} />
+                          </button>
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            value={n}
+                            onChange={(e) => project.setOne(it.uid, e.target.value)}
+                            className="w-14 text-center px-1 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                          />
+                          <button
+                            onClick={() => project.setOne(it.uid, n + 1)}
+                            className="w-8 h-8 rounded-lg border border-slate-200 text-slate-700 inline-flex items-center justify-center"
+                            aria-label="Crește cantitatea"
+                          >
+                            <Plus size={15} />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -804,7 +962,7 @@ const TABS = [
 function AppShell() {
   const { equipment } = useCatalog();
   const [tab, setTab] = useState('search');
-  const [saved, toggleSaved, setSaved] = useLocalSet('instalfinder.saved');
+  const project = useProject();
   const [compareSet, toggleCompare, setCompareSet] = useLocalSet('instalfinder.compare');
   const [showCompare, setShowCompare] = useState(false);
   const [showBanner, setShowBanner] = useState(() => {
@@ -858,16 +1016,14 @@ function AppShell() {
       <main className="max-w-3xl mx-auto px-4 py-4">
         {tab === 'search' && (
           <SearchTab
-            saved={saved}
-            onSave={toggleSaved}
+            saved={project}
+            onSave={project.toggle}
             compareSet={compareSet}
             onCompare={toggleCompare}
           />
         )}
-        {tab === 'assistant' && <AssistantTab saved={saved} onSave={toggleSaved} />}
-        {tab === 'project' && (
-          <ProjectTab saved={saved} onSave={toggleSaved} setSaved={setSaved} />
-        )}
+        {tab === 'assistant' && <AssistantTab saved={project} onSave={project.toggle} />}
+        {tab === 'project' && <ProjectTab project={project} />}
       </main>
 
       {compareItems.length > 0 && tab === 'search' && (
@@ -910,9 +1066,9 @@ function AppShell() {
               >
                 <Icon size={20} />
                 {t.label}
-                {t.key === 'project' && saved.size > 0 && (
+                {t.key === 'project' && project.count > 0 && (
                   <span className="absolute top-1 right-1/2 translate-x-5 bg-amber-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                    {saved.size}
+                    {project.count}
                   </span>
                 )}
               </button>
