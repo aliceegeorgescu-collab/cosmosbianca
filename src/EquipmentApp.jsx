@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect, useContext, createContext } from 'react';
 import {
   Search, Star, SlidersHorizontal, Scale, FolderOpen, Download,
-  Copy, X, ExternalLink, Wand2, Trash2, Building2, Check,
+  Copy, X, ExternalLink, Wand2, Trash2, Building2, Check, ArrowDownUp,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -77,16 +77,19 @@ function SpecRow({ s, value }) {
   );
 }
 
-function EquipmentCard({ item, saved, onSave, compared, onCompare }) {
+function EquipmentCard({ item, saved, onSave, compared, onCompare, onOpen }) {
   const { catMap, domMap } = useCatalog();
-  const [open, setOpen] = useState(false);
   const cat = catMap[item.category];
   const keySpecs = cat.specs.slice(0, 3);
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
+          <button
+            onClick={() => onOpen(item)}
+            className="min-w-0 text-left"
+            aria-label={`Detalii ${item.model}`}
+          >
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="inline-block text-[10px] font-semibold uppercase tracking-wide text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
                 {domMap[cat.domain]?.label}
@@ -98,8 +101,10 @@ function EquipmentCard({ item, saved, onSave, compared, onCompare }) {
             <div className="mt-1.5 flex items-center gap-1.5 text-slate-500 text-sm">
               <Building2 size={14} /> {item.manufacturer}
             </div>
-            <h3 className="font-bold text-slate-900 leading-tight truncate">{item.model}</h3>
-          </div>
+            <h3 className="font-bold text-slate-900 leading-tight truncate hover:text-sky-700">
+              {item.model}
+            </h3>
+          </button>
           <button
             onClick={() => onSave(item.uid)}
             aria-label="Salvează în proiect"
@@ -118,20 +123,12 @@ function EquipmentCard({ item, saved, onSave, compared, onCompare }) {
           ))}
         </div>
 
-        {open && (
-          <div className="mt-1">
-            {cat.specs.slice(3).map((s) => (
-              <SpecRow key={s.key} s={s} value={item.specs[s.key]} />
-            ))}
-          </div>
-        )}
-
         <div className="mt-3 flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => setOpen((o) => !o)}
+            onClick={() => onOpen(item)}
             className="text-sm font-medium text-sky-700 hover:text-sky-900"
           >
-            {open ? 'Mai puține' : 'Toate specificațiile'}
+            Detalii
           </button>
           <a
             href={item.url}
@@ -211,6 +208,72 @@ function CompareModal({ items, onClose }) {
 }
 
 /* ------------------------------------------------------------------ */
+function DetailModal({ item, saved, onSave, compared, onCompare, onClose }) {
+  const { catMap, domMap } = useCatalog();
+  const cat = catMap[item.category];
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[85vh] overflow-auto">
+        <div className="flex items-start justify-between gap-2 p-4 border-b border-slate-200 sticky top-0 bg-white">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="inline-block text-[10px] font-semibold uppercase tracking-wide text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                {domMap[cat.domain]?.label}
+              </span>
+              <span className="inline-block text-[10px] font-semibold uppercase tracking-wide text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full">
+                {cat.label}
+              </span>
+            </div>
+            <div className="mt-1.5 text-slate-500 text-sm">{item.manufacturer}</div>
+            <h2 className="font-bold text-slate-900 leading-tight">{item.model}</h2>
+          </div>
+          <button onClick={onClose} className="p-2 text-slate-500 hover:text-slate-800 shrink-0">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="p-4">
+          {cat.specs.map((s) => (
+            <SpecRow key={s.key} s={s} value={item.specs[s.key]} />
+          ))}
+
+          <div className="mt-4 flex gap-2">
+            <button
+              onClick={() => onSave(item.uid)}
+              className={cls(
+                'flex-1 inline-flex items-center justify-center gap-1.5 font-medium py-2.5 rounded-xl',
+                saved ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-sky-600 text-white',
+              )}
+            >
+              <Star size={16} fill={saved ? 'currentColor' : 'none'} />
+              {saved ? 'În proiect' : 'Adaugă în proiect'}
+            </button>
+            <button
+              onClick={() => onCompare(item.uid)}
+              className={cls(
+                'px-4 inline-flex items-center justify-center gap-1.5 font-medium rounded-xl border',
+                compared ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-200',
+              )}
+            >
+              <Scale size={16} /> Compară
+            </button>
+          </div>
+
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-800"
+          >
+            Pagina producătorului <ExternalLink size={13} />
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 function Chip({ active, children, onClick }) {
   return (
     <button
@@ -232,6 +295,8 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
   const [cat, setCat] = useState('all');
   const [filters, setFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
+  const [sort, setSort] = useState('rel');
+  const [detail, setDetail] = useState(null);
 
   const visibleCats =
     domain === 'all' ? categories : categories.filter((c) => c.domain === domain);
@@ -241,13 +306,27 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
     [activeCat],
   );
 
-  const setF = (k, v) => setFilters((f) => ({ ...f, [k]: v }));
+  const sortOptions = useMemo(() => {
+    const opts = [
+      { v: 'rel', label: 'Relevanță' },
+      { v: 'mfg', label: 'Producător A→Z' },
+      { v: 'model', label: 'Model A→Z' },
+    ];
+    for (const s of numericFilters) {
+      opts.push({ v: `${s.key}|asc`, label: `${s.label} ↑` });
+      opts.push({ v: `${s.key}|desc`, label: `${s.label} ↓` });
+    }
+    return opts;
+  }, [numericFilters]);
+
+  const setBound = (k, bound, v) =>
+    setFilters((f) => ({ ...f, [k]: { ...f[k], [bound]: v } }));
   const resetFilters = () => setFilters({});
 
-  const pickDomain = (d) => { setDomain(d); setCat('all'); resetFilters(); };
-  const pickCat = (c) => { setCat(c); resetFilters(); };
+  const pickDomain = (d) => { setDomain(d); setCat('all'); resetFilters(); setSort('rel'); };
+  const pickCat = (c) => { setCat(c); resetFilters(); setSort('rel'); };
 
-  const results = useMemo(() => {
+  const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
     return equipment.filter((it) => {
       const c = catMap[it.category];
@@ -258,15 +337,62 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
         if (!hay.includes(term)) return false;
       }
       for (const s of numericFilters) {
-        const min = parseFloat(filters[s.key]);
-        if (!isNaN(min) && min > 0) {
-          const val = it.specs[s.key];
-          if (typeof val !== 'number' || val < min) return false;
-        }
+        const f = filters[s.key] || {};
+        const mn = parseFloat(f.min);
+        const mx = parseFloat(f.max);
+        const val = it.specs[s.key];
+        if (!isNaN(mn) && (typeof val !== 'number' || val < mn)) return false;
+        if (!isNaN(mx) && (typeof val !== 'number' || val > mx)) return false;
       }
       return true;
     });
   }, [q, domain, cat, filters, numericFilters, equipment, catMap, domMap]);
+
+  const results = useMemo(() => {
+    const arr = [...filtered];
+    if (sort === 'mfg') {
+      arr.sort((a, b) => a.manufacturer.localeCompare(b.manufacturer) || a.model.localeCompare(b.model));
+    } else if (sort === 'model') {
+      arr.sort((a, b) => a.model.localeCompare(b.model));
+    } else if (sort.includes('|')) {
+      const [k, dir] = sort.split('|');
+      arr.sort((a, b) => {
+        const av = a.specs[k];
+        const bv = b.specs[k];
+        const an = typeof av === 'number';
+        const bn = typeof bv === 'number';
+        if (!an && !bn) return 0;
+        if (!an) return 1;
+        if (!bn) return -1;
+        return dir === 'asc' ? av - bv : bv - av;
+      });
+    }
+    return arr;
+  }, [filtered, sort]);
+
+  const groups = useMemo(() => {
+    if (cat !== 'all') return null;
+    const byCat = new Map();
+    for (const it of results) {
+      if (!byCat.has(it.category)) byCat.set(it.category, []);
+      byCat.get(it.category).push(it);
+    }
+    return categories
+      .filter((c) => byCat.has(c.key))
+      .map((c) => ({ c, list: byCat.get(c.key) }));
+  }, [results, cat, categories]);
+
+  const renderCard = (it) => (
+    <EquipmentCard
+      key={it.id}
+      item={it}
+      saved={saved.has(it.uid)}
+      onSave={onSave}
+      compared={compareSet.has(it.uid)}
+      onCompare={onCompare}
+      onOpen={setDetail}
+    />
+  );
 
   return (
     <div>
@@ -305,8 +431,8 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
           ))}
         </div>
 
-        {numericFilters.length > 0 && (
-          <div className="mt-2">
+        <div className="mt-2 flex items-center gap-2">
+          {numericFilters.length > 0 && (
             <button
               onClick={() => setShowFilters((s) => !s)}
               className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600"
@@ -314,46 +440,95 @@ function SearchTab({ saved, onSave, compareSet, onCompare }) {
               <SlidersHorizontal size={15} />
               Filtre {showFilters ? '▲' : '▼'}
             </button>
-            {showFilters && (
-              <div className="mt-2 grid grid-cols-2 gap-2 bg-white p-3 rounded-xl border border-slate-200">
-                {numericFilters.map((s) => (
-                  <label key={s.key} className="text-sm">
-                    <span className="text-slate-500">
-                      {s.label} ≥ {s.unit && `(${s.unit})`}
-                    </span>
+          )}
+          <label className="ml-auto inline-flex items-center gap-1.5 text-sm text-slate-600">
+            <ArrowDownUp size={15} />
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="bg-white border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-sky-300"
+            >
+              {sortOptions.map((o) => (
+                <option key={o.v} value={o.v}>{o.label}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        {numericFilters.length > 0 && showFilters && (
+          <div className="mt-2 grid grid-cols-1 gap-2 bg-white p-3 rounded-xl border border-slate-200">
+            {numericFilters.map((s) => {
+              const f = filters[s.key] || {};
+              return (
+                <div key={s.key} className="text-sm">
+                  <span className="text-slate-500">
+                    {s.label} {s.unit && `(${s.unit})`}
+                  </span>
+                  <div className="mt-1 flex items-center gap-2">
                     <input
                       type="number"
                       inputMode="decimal"
-                      value={filters[s.key] ?? ''}
-                      onChange={(e) => setF(s.key, e.target.value)}
-                      className="mt-1 w-full px-2 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                      placeholder="min"
+                      value={f.min ?? ''}
+                      onChange={(e) => setBound(s.key, 'min', e.target.value)}
+                      className="w-full px-2 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-300"
                     />
-                  </label>
-                ))}
-              </div>
-            )}
+                    <span className="text-slate-400">–</span>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="max"
+                      value={f.max ?? ''}
+                      onChange={(e) => setBound(s.key, 'max', e.target.value)}
+                      className="w-full px-2 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            <button
+              onClick={resetFilters}
+              className="justify-self-start text-xs font-medium text-rose-600"
+            >
+              Resetează filtrele
+            </button>
           </div>
         )}
       </div>
 
       <p className="text-sm text-slate-500 mb-2">{results.length} rezultate</p>
-      <div className="grid sm:grid-cols-2 gap-3 pb-24">
-        {results.map((it) => (
-          <EquipmentCard
-            key={it.id}
-            item={it}
-            saved={saved.has(it.uid)}
-            onSave={onSave}
-            compared={compareSet.has(it.uid)}
-            onCompare={onCompare}
-          />
-        ))}
-        {results.length === 0 && (
-          <p className="text-slate-400 text-sm py-10 text-center col-span-full">
-            Niciun echipament nu corespunde criteriilor.
-          </p>
+
+      {results.length === 0 && (
+        <p className="text-slate-400 text-sm py-10 text-center">
+          Niciun echipament nu corespunde criteriilor.
+        </p>
+      )}
+
+      {groups
+        ? groups.map(({ c, list }) => (
+            <div key={c.key} className="mb-5">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 mb-2">
+                {domMap[c.domain]?.label} · {c.label} ({list.length})
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">{list.map(renderCard)}</div>
+            </div>
+          ))
+        : (
+          <div className="grid sm:grid-cols-2 gap-3 pb-24">{results.map(renderCard)}</div>
         )}
-      </div>
+
+      {groups && <div className="pb-24" />}
+
+      {detail && (
+        <DetailModal
+          item={detail}
+          saved={saved.has(detail.uid)}
+          onSave={onSave}
+          compared={compareSet.has(detail.uid)}
+          onCompare={onCompare}
+          onClose={() => setDetail(null)}
+        />
+      )}
     </div>
   );
 }
